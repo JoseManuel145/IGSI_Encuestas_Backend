@@ -64,12 +64,13 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Lombok: genera automáticamente getters, setters, constructores, etc. -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<optional>true</optional>
+			<version>1.18.32</version>
 		</dependency>
+
+
 
 		<!-- Dependencias para pruebas unitarias e integración en Spring Boot -->
 		<dependency>
