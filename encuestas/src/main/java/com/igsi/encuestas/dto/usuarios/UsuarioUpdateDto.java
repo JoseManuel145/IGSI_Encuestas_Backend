@@ -1,13 +1,12 @@
-package com.igsi.encuestas.dto;
+package com.igsi.encuestas.dto.usuarios;
 
 import lombok.Data;
-// Modelo para registrar nuevos usuarios
+
+// Modelo para actualizar los campos del usuario
 @Data
-public class UsuarioCreateDto {
+public class UsuarioUpdateDto {
     private String nombre;
     private String correo;
     private String password;
-    private String rol;
     private Long idDepartamento;
-
 }

@@ -1,6 +1,6 @@
 package com.igsi.encuestas.services.impl;
 
-import com.igsi.encuestas.dto.*;
+import com.igsi.encuestas.dto.usuarios.*;
 import com.igsi.encuestas.models.UsuarioModel;
 import com.igsi.encuestas.repositories.UsuarioRepository;
 import com.igsi.encuestas.services.UsuarioService;

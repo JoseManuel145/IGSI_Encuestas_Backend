@@ -1,6 +1,6 @@
 package com.igsi.encuestas.services;
 
-import com.igsi.encuestas.dto.*;
+import com.igsi.encuestas.dto.usuarios.*;
 
 import java.util.List;
 import java.util.Optional;

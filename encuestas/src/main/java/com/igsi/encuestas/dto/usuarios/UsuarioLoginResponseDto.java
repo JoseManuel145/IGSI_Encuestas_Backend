@@ -1,4 +1,4 @@
-package com.igsi.encuestas.dto;
+package com.igsi.encuestas.dto.usuarios;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

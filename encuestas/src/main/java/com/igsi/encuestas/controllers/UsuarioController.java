@@ -1,6 +1,6 @@
 package com.igsi.encuestas.controllers;
 
-import com.igsi.encuestas.dto.*;
+import com.igsi.encuestas.dto.usuarios.*;
 import com.igsi.encuestas.services.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
