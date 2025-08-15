@@ -1,6 +1,8 @@
 package com.igsi.encuestas.dto;
 
+import lombok.Data;
 // Modelo para registrar nuevos usuarios
+@Data
 public class UsuarioCreateDto {
     private String nombre;
     private String correo;
@@ -8,43 +10,4 @@ public class UsuarioCreateDto {
     private String rol;
     private Long idDepartamento;
 
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getCorreo() {
-        return correo;
-    }
-
-    public void setCorreo(String correo) {
-        this.correo = correo;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getRol() {
-        return rol;
-    }
-
-    public void setRol(String rol) {
-        this.rol = rol;
-    }
-
-    public Long getIdDepartamento() {
-        return idDepartamento;
-    }
-
-    public void setIdDepartamento(Long idDepartamento) {
-        this.idDepartamento = idDepartamento;
-    }
 }
