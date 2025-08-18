@@ -44,9 +44,8 @@ public interface AlumnoService {
 
     /**
      * Valida el login de un alumno con nombre y contraseña.
-     * @param nombre Nombre del alumno
-     * @param password Contraseña del alumno
+     * @param alumnoDto Esquema del alumno para hacer login
      * @return Optional con el alumno si las credenciales son correctas
      */
-    Optional<AlumnoLoginResponseDto> login(String nombre, String password);
+    Optional<AlumnoLoginResponseDto> login(AlumnoDto alumnoDto);
 }

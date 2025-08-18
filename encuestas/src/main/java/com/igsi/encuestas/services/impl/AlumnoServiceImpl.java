@@ -76,18 +76,18 @@ public class AlumnoServiceImpl implements AlumnoService {
     }
 
     @Override
-    public Optional<AlumnoLoginResponseDto> login(String nombre, String password) {
+    public Optional<AlumnoLoginResponseDto> login(AlumnoDto alumnoDto) {
         // clave segura para firmar el token
         SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
 
-        Optional<AlumnoModel> alumnoOpt = repository.getByNombre(nombre);
+        Optional<AlumnoModel> alumnoOpt = repository.getByNombre(alumnoDto.getNombre());
 
         if (alumnoOpt.isEmpty()) return Optional.empty();
 
         AlumnoModel alumno = alumnoOpt.get();
 
         // Validar contraseña (simple, sin hash)
-        if (!alumno.getPassword().equals(password)) {
+        if (!alumno.getPassword().equals(alumnoDto.getPassword())) {
             return Optional.empty();
         }
 

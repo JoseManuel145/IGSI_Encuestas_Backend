@@ -1,6 +1,7 @@
 package com.igsi.encuestas.controllers;
 
 import com.igsi.encuestas.dto.alumnos.AlumnoDto;
+import com.igsi.encuestas.dto.alumnos.AlumnoLoginResponseDto;
 import com.igsi.encuestas.services.AlumnoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping
+@RequestMapping("/api/alumnos")
 public class AlumnoController {
     private final AlumnoService service;
 
@@ -46,5 +47,12 @@ public class AlumnoController {
         } else {
             return ResponseEntity.notFound().build(); // 404
         }
+    }
+    // LOGIN
+    @PostMapping("/login")
+    public ResponseEntity<AlumnoLoginResponseDto> login(@RequestBody AlumnoDto loginDto) {
+        Optional<AlumnoLoginResponseDto> tokenOpt = service.login(loginDto);
+        return tokenOpt.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }
 }
