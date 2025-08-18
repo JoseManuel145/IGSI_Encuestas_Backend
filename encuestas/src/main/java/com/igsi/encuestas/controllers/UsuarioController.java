@@ -13,28 +13,28 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
-    private final UsuarioService usuarioService;
+    private final UsuarioService service;
 
     public UsuarioController(UsuarioService usuarioService) {
-        this.usuarioService = usuarioService;
+        this.service = usuarioService;
     }
     // LISTAR USUARIOS
     @GetMapping
     public ResponseEntity<List<UsuarioDto>> getAll() {
-        List<UsuarioDto> usuarios = usuarioService.getAll();
+        List<UsuarioDto> usuarios = service.getAll();
         return ResponseEntity.ok(usuarios);
     }
     // OBTENER POR ID
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioDto> getById(@PathVariable Long id) {
-        Optional<UsuarioDto> usuarioOpt = usuarioService.getById(id);
+        Optional<UsuarioDto> usuarioOpt = service.getById(id);
         return usuarioOpt.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
     // OBTENER POR CORREO
     @GetMapping("/correo/{correo}")
     public ResponseEntity<UsuarioDto> getByCorreo(@PathVariable String correo) {
-        Optional<UsuarioDto> usuarioOpt = usuarioService.getByCorreo(correo);
+        Optional<UsuarioDto> usuarioOpt = service.getByCorreo(correo);
         return usuarioOpt.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -42,7 +42,7 @@ public class UsuarioController {
     @PostMapping
     @PreAuthorize("hasRole('AdminGeneral')")
     public ResponseEntity<UsuarioDto> create(@RequestBody UsuarioCreateDto usuarioCreateDto) {
-        UsuarioDto nuevoUsuario = usuarioService.save(usuarioCreateDto);
+        UsuarioDto nuevoUsuario = service.save(usuarioCreateDto);
         return new ResponseEntity<>(nuevoUsuario, HttpStatus.CREATED);
     }
     // ACTUALIZAR USUARIO
@@ -50,10 +50,10 @@ public class UsuarioController {
     @PreAuthorize("hasRole('AdminGeneral')")
     public ResponseEntity<UsuarioDto> update(@PathVariable Long id,
                                              @RequestBody UsuarioUpdateDto usuarioUpdateDto) {
-        boolean actualizado = usuarioService.update(id, usuarioUpdateDto);
+        boolean actualizado = service.update(id, usuarioUpdateDto);
         if (!actualizado) return ResponseEntity.notFound().build();
 
-        Optional<UsuarioDto> usuarioOpt = usuarioService.getById(id);
+        Optional<UsuarioDto> usuarioOpt = service.getById(id);
         return usuarioOpt.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -61,14 +61,14 @@ public class UsuarioController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('AdminGeneral')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        boolean eliminado = usuarioService.delete(id);
+        boolean eliminado = service.delete(id);
         return eliminado ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
     }
     // LOGIN
     @PostMapping("/login")
     public ResponseEntity<UsuarioLoginResponseDto> login(@RequestBody UsuarioLoginDto loginDto) {
-        Optional<UsuarioLoginResponseDto> tokenOpt = usuarioService.login(loginDto);
+        Optional<UsuarioLoginResponseDto> tokenOpt = service.login(loginDto);
         return tokenOpt.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }

@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
-    private final UsuarioRepository usuarioRepository;
+    private final UsuarioRepository repository;
     private final BCryptPasswordEncoder passwordEncoder;
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -28,7 +28,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     private long jwtExpirationMs;
     //  Inyeccion de Dependencias del repositorio
     public UsuarioServiceImpl(UsuarioRepository usuarioRepository){
-        this.usuarioRepository = usuarioRepository;
+        this.repository = usuarioRepository;
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 //  Mapeo de UsuarioModel a UsuarioDto
@@ -41,18 +41,18 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
     @Override
     public List<UsuarioDto> getAll() {
-        return usuarioRepository.getAll().stream()
+        return repository.getAll().stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
     @Override
     public Optional<UsuarioDto> getById(Long id) {
-        return usuarioRepository.getById(id)
+        return repository.getById(id)
                 .map(this::mapToDto);
     }
     @Override
     public Optional<UsuarioDto> getByCorreo(String correo) {
-        return usuarioRepository.getByCorreo(correo)
+        return repository.getByCorreo(correo)
                 .map(this::mapToDto);
     }
     @Override
@@ -68,13 +68,13 @@ public class UsuarioServiceImpl implements UsuarioService {
                 usuarioCreateDto.getRol(),
                 usuarioCreateDto.getIdDepartamento()
         );
-        usuarioRepository.saveUser(usuario);
+        repository.saveUser(usuario);
 
         return mapToDto(usuario);
     }
     @Override
     public boolean update(Long id, UsuarioUpdateDto usuarioUpdateDto) {
-        Optional<UsuarioModel> existing = usuarioRepository.getById(id);
+        Optional<UsuarioModel> existing = repository.getById(id);
         if (existing.isEmpty()) return false;
 
         UsuarioModel usuario = existing.get();
@@ -87,18 +87,18 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         usuario.setIdDepartamento(usuarioUpdateDto.getIdDepartamento());
 
-        return usuarioRepository.updateUser(usuario) > 0;
+        return repository.updateUser(usuario) > 0;
     }
     @Override
     public boolean delete(Long id) {
-        return usuarioRepository.delete(id) > 0;
+        return repository.delete(id) > 0;
     }
     @Override
     public Optional<UsuarioLoginResponseDto> login(UsuarioLoginDto loginDto) {
 
         SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
 
-        Optional<UsuarioModel> usuarioOpt = usuarioRepository.getByCorreo(loginDto.getCorreo());
+        Optional<UsuarioModel> usuarioOpt = repository.getByCorreo(loginDto.getCorreo());
 
         if (usuarioOpt.isEmpty()) return Optional.empty();
 

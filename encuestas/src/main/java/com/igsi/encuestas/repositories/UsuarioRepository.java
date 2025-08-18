@@ -47,8 +47,8 @@ public class UsuarioRepository {
         ).stream().findFirst();
     }
 //  Registrar un Usuario
-    public int saveUser(UsuarioModel usuario) {
-        return jdbcTemplate.update(
+    public void saveUser(UsuarioModel usuario) {
+        jdbcTemplate.update(
                 "INSERT INTO Usuarios(correo, password, rol, id_departamento) VALUES (?, ?, ?, ?)",
                 usuario.getCorreo(),
                 usuario.getPassword(),

@@ -53,5 +53,4 @@ public interface UsuarioService {
      * @return True si se eliminó, False si no
      */
     Optional<UsuarioLoginResponseDto> login(UsuarioLoginDto usuarioLoginDto);
-
 }
