@@ -28,7 +28,8 @@ public class UsuarioRepository {
     public List<UsuarioModel> getAll() {
         return jdbcTemplate.query(
                 "SELECT * FROM Usuarios",
-                usuarioRowMapper);
+                usuarioRowMapper
+        );
     }
 //  Buscar por ID
     public Optional<UsuarioModel> getById(Long id) {
