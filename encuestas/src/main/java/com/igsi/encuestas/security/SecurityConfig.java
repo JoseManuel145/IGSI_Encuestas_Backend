@@ -18,19 +18,14 @@ public class SecurityConfig {
         this.corsConfig = corsConfig;
     }
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(csrf -> csrf.disable()) // 🔹 Desactiva CSRF (para pruebas con Postman)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/usuarios/login").permitAll()
-                        .requestMatchers("/api/usuarios/**").hasAnyRole("AdminGeneral", "Empleado")
+                        .requestMatchers("/api/**").permitAll() // 🔹 Permite acceso libre a tu API
                         .anyRequest().authenticated()
-                );
-
-        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
+                )
+                .httpBasic(httpBasic -> {}); // opcional: habilita login básico en /login
         return http.build();
     }
 }
