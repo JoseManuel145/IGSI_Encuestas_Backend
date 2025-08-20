@@ -1,6 +1,9 @@
 package com.igsi.encuestas.services.impl;
 
-import com.igsi.encuestas.dto.usuarios.*;
+import com.igsi.encuestas.dto.usuarios.request.UsuarioLoginRequest;
+import com.igsi.encuestas.dto.usuarios.request.UsuarioRequest;
+import com.igsi.encuestas.dto.usuarios.response.UsuarioLoginResponse;
+import com.igsi.encuestas.dto.usuarios.response.UsuarioResponse;
 import com.igsi.encuestas.models.UsuarioModel;
 import com.igsi.encuestas.repositories.UsuarioRepository;
 import com.igsi.encuestas.services.UsuarioService;
@@ -19,96 +22,100 @@ import java.util.stream.Collectors;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
+
     private final UsuarioRepository repository;
     private final BCryptPasswordEncoder passwordEncoder;
+
     @Value("${jwt.secret}")
     private String jwtSecret;
 
     @Value("${jwt.expiration-ms}")
     private long jwtExpirationMs;
-    //  Inyeccion de Dependencias del repositorio
-    public UsuarioServiceImpl(UsuarioRepository usuarioRepository){
+
+    public UsuarioServiceImpl(UsuarioRepository usuarioRepository) {
         this.repository = usuarioRepository;
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
-//  Mapeo de UsuarioModel a UsuarioDto
-    private UsuarioDto mapToDto(UsuarioModel usuario) {
-        UsuarioDto dto = new UsuarioDto();
-        dto.setNombre(usuario.getNombre());
-        dto.setCorreo(usuario.getCorreo());
-        dto.setIdDepartamento(usuario.getIdDepartamento());
-        return dto;
+
+    // Mapea UsuarioModel -> UsuarioResponse
+    private UsuarioResponse mapToResponse(UsuarioModel usuario) {
+        return new UsuarioResponse(
+                usuario.getIdUsuario(),
+                usuario.getNombre(),
+                usuario.getCorreo(),
+                usuario.getRol(),
+                usuario.getIdDepartamento()
+        );
     }
+
     @Override
-    public List<UsuarioDto> getAll() {
+    public List<UsuarioResponse> getAll() {
         return repository.getAll().stream()
-                .map(this::mapToDto)
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
+
     @Override
-    public Optional<UsuarioDto> getById(Long id) {
-        return repository.getById(id)
-                .map(this::mapToDto);
+    public Optional<UsuarioResponse> getById(Long id) {
+        return repository.getById(id).map(this::mapToResponse);
     }
+
     @Override
-    public Optional<UsuarioDto> getByCorreo(String correo) {
-        return repository.getByCorreo(correo)
-                .map(this::mapToDto);
+    public Optional<UsuarioResponse> getByCorreo(String correo) {
+        return repository.getByCorreo(correo).map(this::mapToResponse);
     }
+
     @Override
-    public UsuarioDto save(UsuarioCreateDto usuarioCreateDto) {
-        // Hash de la contraseña
-        String hashedPassword = passwordEncoder.encode(usuarioCreateDto.getPassword());
+    public UsuarioResponse save(UsuarioRequest usuarioRequest) {
+        String hashedPassword = passwordEncoder.encode(usuarioRequest.getPassword());
 
         UsuarioModel usuario = new UsuarioModel(
                 null,
-                usuarioCreateDto.getNombre(),
-                usuarioCreateDto.getCorreo(),
+                usuarioRequest.getNombre(),
+                usuarioRequest.getCorreo(),
                 hashedPassword,
-                usuarioCreateDto.getRol(),
-                usuarioCreateDto.getIdDepartamento()
+                usuarioRequest.getRol(),
+                usuarioRequest.getIdDepartamento()
         );
-        repository.saveUser(usuario);
 
-        return mapToDto(usuario);
+        repository.saveUser(usuario);
+        return mapToResponse(usuario);
     }
+
     @Override
-    public boolean update(Long id, UsuarioUpdateDto usuarioUpdateDto) {
+    public boolean update(Long id, UsuarioRequest usuarioRequest) {
         Optional<UsuarioModel> existing = repository.getById(id);
         if (existing.isEmpty()) return false;
 
         UsuarioModel usuario = existing.get();
-        usuario.setNombre(usuarioUpdateDto.getNombre());
-        usuario.setCorreo(usuarioUpdateDto.getCorreo());
-
-        if (usuarioUpdateDto.getPassword() != null && !usuarioUpdateDto.getPassword().isEmpty()) {
-            usuario.setPassword(passwordEncoder.encode(usuarioUpdateDto.getPassword()));
+        usuario.setNombre(usuarioRequest.getNombre());
+        usuario.setCorreo(usuarioRequest.getCorreo());
+        if (usuarioRequest.getPassword() != null && !usuarioRequest.getPassword().isEmpty()) {
+            usuario.setPassword(passwordEncoder.encode(usuarioRequest.getPassword()));
         }
-
-        usuario.setIdDepartamento(usuarioUpdateDto.getIdDepartamento());
+        usuario.setRol(usuarioRequest.getRol());
+        usuario.setIdDepartamento(usuarioRequest.getIdDepartamento());
 
         return repository.updateUser(usuario) > 0;
     }
+
     @Override
     public boolean delete(Long id) {
         return repository.delete(id) > 0;
     }
-    @Override
-    public Optional<UsuarioLoginResponseDto> login(UsuarioLoginDto loginDto) {
 
+    @Override
+    public Optional<UsuarioLoginResponse> login(UsuarioLoginRequest loginRequest) {
         SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
 
-        Optional<UsuarioModel> usuarioOpt = repository.getByCorreo(loginDto.getCorreo());
-
+        Optional<UsuarioModel> usuarioOpt = repository.getByCorreo(loginRequest.getCorreo());
         if (usuarioOpt.isEmpty()) return Optional.empty();
 
         UsuarioModel usuario = usuarioOpt.get();
-
-        // Verifica contraseña
-        if (!passwordEncoder.matches(loginDto.getPassword(), usuario.getPassword())) {
+        if (!passwordEncoder.matches(loginRequest.getPassword(), usuario.getPassword())) {
             return Optional.empty();
         }
-        // Genera JWT
+
         String token = Jwts.builder()
                 .setSubject(usuario.getCorreo())
                 .claim("rol", usuario.getRol())
@@ -118,11 +125,15 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .signWith(key)
                 .compact();
 
-        UsuarioLoginResponseDto response = new UsuarioLoginResponseDto(
+        UsuarioLoginResponse response = new UsuarioLoginResponse(
+                usuario.getIdUsuario(),
+                usuario.getNombre(),
                 usuario.getCorreo(),
                 usuario.getRol(),
+                usuario.getIdDepartamento(),
                 token
         );
+
         return Optional.of(response);
     }
 }
