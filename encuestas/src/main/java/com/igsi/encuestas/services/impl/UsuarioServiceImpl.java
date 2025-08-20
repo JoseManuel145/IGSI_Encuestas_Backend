@@ -78,7 +78,8 @@ public class UsuarioServiceImpl implements UsuarioService {
                 usuarioRequest.getIdDepartamento()
         );
 
-        repository.saveUser(usuario);
+        Long iDGenerado = repository.saveUser(usuario);
+        usuario.setIdUsuario(iDGenerado);
         return mapToResponse(usuario);
     }
 
