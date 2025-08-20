@@ -1,7 +1,9 @@
 package com.igsi.encuestas.services.impl;
 
-import com.igsi.encuestas.dto.alumnos.AlumnoDto;
-import com.igsi.encuestas.dto.alumnos.AlumnoLoginResponseDto;
+import com.igsi.encuestas.dto.alumnos.request.AlumnoRequest;
+import com.igsi.encuestas.dto.alumnos.response.AlumnoIdResponse;
+import com.igsi.encuestas.dto.alumnos.response.AlumnoLoginResponse;
+import com.igsi.encuestas.dto.alumnos.response.AlumnoResponse;
 import com.igsi.encuestas.models.AlumnoModel;
 import com.igsi.encuestas.repositories.AlumnoRepository;
 import com.igsi.encuestas.services.AlumnoService;
@@ -32,42 +34,41 @@ public class AlumnoServiceImpl implements AlumnoService {
         this.repository = alumnoRepository;
     }
 
-    // Mapeo de AlumnoModel a AlumnoDto
-    private AlumnoDto mapToDto(AlumnoModel alumno) {
-        AlumnoDto dto = new AlumnoDto();
-        dto.setNombre(alumno.getNombre());
-        dto.setPassword(alumno.getPassword());
-        return dto;
+    // Mapeos
+    private AlumnoResponse mapToResponse(AlumnoModel alumno) {
+        return new AlumnoResponse(alumno.getIdAlumno(), alumno.getNombre());
+    }
+
+    private AlumnoIdResponse mapToIdResponse(AlumnoModel alumno) {
+        return new AlumnoIdResponse(alumno.getIdAlumno(), alumno.getNombre(), alumno.getPassword());
     }
 
     @Override
-    public List<AlumnoDto> getAll() {
+    public List<AlumnoResponse> getAll() {
         return repository.getAll().stream()
-                .map(this::mapToDto)
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Optional<AlumnoDto> getById(Long id) {
-        return repository.getById(id)
-                .map(this::mapToDto);
+    public Optional<AlumnoIdResponse> getById(Long id) {
+        return repository.getById(id).map(this::mapToIdResponse);
     }
 
     @Override
-    public Optional<AlumnoDto> getByNombre(String nombre) {
-        return repository.getByNombre(nombre)
-                .map(this::mapToDto);
+    public Optional<AlumnoResponse> getByNombre(String nombre) {
+        return repository.getByNombre(nombre).map(this::mapToResponse);
     }
 
     @Override
-    public AlumnoDto save(AlumnoDto alumnoCreateDto) {
+    public AlumnoResponse save(AlumnoRequest alumnoRequest) {
         AlumnoModel alumno = new AlumnoModel(
                 null,
-                alumnoCreateDto.getNombre(),
-                alumnoCreateDto.getPassword()
+                alumnoRequest.getNombre(),
+                alumnoRequest.getPassword()
         );
         repository.saveAlumno(alumno);
-        return mapToDto(alumno);
+        return mapToResponse(alumno);
     }
 
     @Override
@@ -76,37 +77,35 @@ public class AlumnoServiceImpl implements AlumnoService {
     }
 
     @Override
-    public Optional<AlumnoLoginResponseDto> login(AlumnoDto alumnoDto) {
-        // clave segura para firmar el token
+    public Optional<AlumnoLoginResponse> login(AlumnoRequest alumnoRequest) {
+        // Crear clave segura de al menos 256 bits
         SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
 
-        Optional<AlumnoModel> alumnoOpt = repository.getByNombre(alumnoDto.getNombre());
-
+        Optional<AlumnoModel> alumnoOpt = repository.getByNombre(alumnoRequest.getNombre());
         if (alumnoOpt.isEmpty()) return Optional.empty();
 
         AlumnoModel alumno = alumnoOpt.get();
 
-        // Validar contraseña (simple, sin hash)
-        if (!alumno.getPassword().equals(alumnoDto.getPassword())) {
+        // Validar contraseña
+        if (!alumno.getPassword().equals(alumnoRequest.getPassword())) {
             return Optional.empty();
         }
 
         // Generar JWT
         String token = Jwts.builder()
                 .setSubject(alumno.getNombre())
-                .claim("id", alumno.getIdAlumno()) // puedes guardar el id del alumno
+                .claim("id", alumno.getIdAlumno())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(key)
                 .compact();
 
-        // Retornar DTO de respuesta
-        AlumnoLoginResponseDto response = new AlumnoLoginResponseDto(
+        AlumnoLoginResponse response = new AlumnoLoginResponse(
+                alumno.getIdAlumno(),
                 alumno.getNombre(),
                 token
         );
 
         return Optional.of(response);
     }
-
 }

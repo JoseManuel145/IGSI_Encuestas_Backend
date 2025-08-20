@@ -1,7 +1,9 @@
 package com.igsi.encuestas.services;
 
-import com.igsi.encuestas.dto.alumnos.AlumnoDto;
-import com.igsi.encuestas.dto.alumnos.AlumnoLoginResponseDto;
+import com.igsi.encuestas.dto.alumnos.request.AlumnoRequest;
+import com.igsi.encuestas.dto.alumnos.response.AlumnoIdResponse;
+import com.igsi.encuestas.dto.alumnos.response.AlumnoLoginResponse;
+import com.igsi.encuestas.dto.alumnos.response.AlumnoResponse;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,28 +14,28 @@ public interface AlumnoService {
      * Obtiene todos los alumnos registrados.
      * @return Lista de alumnos
      */
-    List<AlumnoDto> getAll();
+    List<AlumnoResponse> getAll();
 
     /**
      * Busca un alumno por su ID.
      * @param id ID del alumno
      * @return Optional con el alumno si existe, vacío si no
      */
-    Optional<AlumnoDto> getById(Long id);
+    Optional<AlumnoIdResponse> getById(Long id);
 
     /**
      * Busca un alumno por su ID.
      * @param nombre ID del alumno
      * @return Optional con el alumno si existe, vacío si no
      */
-    Optional<AlumnoDto> getByNombre(String nombre);
+    Optional<AlumnoResponse> getByNombre(String nombre);
 
     /**
      * Guarda un nuevo alumno.
      * @param alumno Alumno a registrar
      * @return Alumno registrado con ID asignado
      */
-    AlumnoDto save(AlumnoDto alumno);
+    AlumnoResponse save(AlumnoRequest alumno);
 
     /**
      * Elimina un alumno por su ID.
@@ -47,5 +49,5 @@ public interface AlumnoService {
      * @param alumnoDto Esquema del alumno para hacer login
      * @return Optional con el alumno si las credenciales son correctas
      */
-    Optional<AlumnoLoginResponseDto> login(AlumnoDto alumnoDto);
+    Optional<AlumnoLoginResponse> login(AlumnoRequest alumnoDto);
 }

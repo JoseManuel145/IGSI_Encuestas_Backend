@@ -1,0 +1,14 @@
+package com.igsi.encuestas.dto.alumnos.response;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class AlumnoIdResponse {
+    private Long idAlumno;
+    private String nombre;
+    private String password;
+}
