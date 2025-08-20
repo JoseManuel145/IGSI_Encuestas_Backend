@@ -1,6 +1,7 @@
 package com.igsi.encuestas.services.impl;
 
-import com.igsi.encuestas.dto.departamentos.DepartamentoDto;
+import com.igsi.encuestas.dto.departamentos.request.DepartamentoRequest;
+import com.igsi.encuestas.dto.departamentos.response.DepartamentoResponse;
 import com.igsi.encuestas.models.DepartamentoModel;
 import com.igsi.encuestas.repositories.DepartamentoRepository;
 import com.igsi.encuestas.services.DepartamentoService;
@@ -12,62 +13,71 @@ import java.util.stream.Collectors;
 
 @Service
 public class DepartamentoServiceImpl implements DepartamentoService {
+
     private final DepartamentoRepository repository;
 
     public DepartamentoServiceImpl(DepartamentoRepository repository) {
         this.repository = repository;
     }
-//  Mapeo de DepartamentoModel a DepartamentoDto
-    private DepartamentoDto mapToDto(DepartamentoModel departamento) {
-        DepartamentoDto dto = new DepartamentoDto();
-        dto.setNombre(departamento.getNombre());
-        dto.setDescripcion(departamento.getDescripcion());
-        dto.setDeleted(departamento.getDeleted());
-        return dto;
+
+    // Mapea DepartamentoModel a DepartamentoResponse
+    private DepartamentoResponse mapToResponse(DepartamentoModel departamento) {
+        DepartamentoResponse response = new DepartamentoResponse();
+        response.setIdDepartamento(departamento.getIdDepartamento());
+        response.setNombre(departamento.getNombre());
+        response.setDescripcion(departamento.getDescripcion());
+        return response;
     }
+
     @Override
-    public List<DepartamentoDto> getAll() {
+    public List<DepartamentoResponse> getAll() {
         return repository.getAll().stream()
-                .map(this::mapToDto)
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
+
     @Override
-    public Optional<DepartamentoDto> getById(Long id) {
+    public Optional<DepartamentoResponse> getById(Long id) {
         return repository.getById(id)
-                .map(this::mapToDto);
+                .map(this::mapToResponse);
     }
+
     @Override
-    public DepartamentoDto save(DepartamentoDto departamentoDto) {
-        // Convertimos DTO a Model
+    public DepartamentoResponse save(DepartamentoRequest departamentoRequest) {
+        // Convertir request a model
         DepartamentoModel departamento = new DepartamentoModel(
                 null,
-                departamentoDto.getNombre(),
-                departamentoDto.getDescripcion(),
+                departamentoRequest.getNombre(),
+                departamentoRequest.getDescripcion(),
                 false
         );
 
-        // Guardamos en la base de datos
-        repository.saveDepartamento(departamento);
-
-        // Convertimos nuevamente a DTO y retornamos
-        return mapToDto(departamento);
+        // Guardar en base de datos
+        Long idGenerado = repository.saveDepartamento(departamento);
+        departamento.setIdDepartamento(idGenerado);
+        // Retornar como response
+        return mapToResponse(departamento);
     }
-    @Override
-    public boolean update(Long id, DepartamentoDto departamento) {
-        Optional<DepartamentoModel> existing = repository.getById(id);
 
-        if(existing.isEmpty())return false;
+    @Override
+    public boolean update(Long id, DepartamentoRequest departamentoRequest) {
+        Optional<DepartamentoModel> existing = repository.getById(id);
+        if (existing.isEmpty()) return false;
 
         DepartamentoModel depa = existing.get();
-
-        depa.setNombre(departamento.getNombre());
-        depa.setDescripcion(departamento.getDescripcion());
-        depa.setDeleted(departamento.getDeleted());
+        depa.setNombre(departamentoRequest.getNombre());
+        depa.setDescripcion(departamentoRequest.getDescripcion());
 
         return repository.updateDepartamento(depa) > 0;
     }
+
     @Override
     public boolean delete(Long id) {
         return repository.delete(id) > 0;
+    }
+
+    @Override
+    public boolean softDelete(Long id) {
+        return repository.softDelete(id) > 0;
     }
 }
