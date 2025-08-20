@@ -3,8 +3,12 @@ package com.igsi.encuestas.repositories;
 import com.igsi.encuestas.models.AlumnoModel;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,14 +50,22 @@ public class AlumnoRepository {
     }
 
 //  REGISTRAR UN ALUMNO
-    public void saveAlumno(AlumnoModel alumno) {
-        jdbcTemplate.update(
-                "INSERT INTO Alumnos(nombre,password) VALUES (?, ?)",
-                alumno.getNombre(),
-                alumno.getPassword()
-        );
+    public Long saveAlumno(AlumnoModel alumno) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO alumnos(nombre, password) VALUES (?, ?)",
+                    Statement.RETURN_GENERATED_KEYS
+            );
+            ps.setString(1, alumno.getNombre());
+            ps.setString(2, alumno.getPassword());
+            return ps;
+        }, keyHolder);
+
+        return keyHolder.getKey().longValue();
     }
-//  ELIMINAR UN ALUMNO
+
+    //  ELIMINAR UN ALUMNO
     public int delete(Long id) {
         return jdbcTemplate.update(
                 "DELETE FROM Alumnos WHERE id_alumno = ?",

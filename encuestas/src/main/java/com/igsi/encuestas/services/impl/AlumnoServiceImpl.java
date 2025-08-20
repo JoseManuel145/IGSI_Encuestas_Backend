@@ -63,12 +63,17 @@ public class AlumnoServiceImpl implements AlumnoService {
     @Override
     public AlumnoResponse save(AlumnoRequest alumnoRequest) {
         AlumnoModel alumno = new AlumnoModel(
-                null,
+                null, // id será generado por la BD
                 alumnoRequest.getNombre(),
                 alumnoRequest.getPassword()
         );
-        repository.saveAlumno(alumno);
-        return mapToResponse(alumno);
+
+        // Guardar en BD y obtener el ID generado
+        Long idGenerado = repository.saveAlumno(alumno);
+        alumno.setIdAlumno(idGenerado);
+
+        // Mapear a DTO de respuesta
+        return new AlumnoResponse(alumno.getIdAlumno(), alumno.getNombre());
     }
 
     @Override
