@@ -101,4 +101,9 @@ public class EncuestaServiceImpl implements EncuestaService {
     public boolean softDelete(Long id) {
         return repository.softDelete(id) > 0;
     }
+    @Override
+    public boolean restaurar(Long id) {
+        return repository.restaurar(id) > 0;
+    }
+
 }

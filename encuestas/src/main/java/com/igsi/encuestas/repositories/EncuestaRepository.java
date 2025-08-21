@@ -107,4 +107,11 @@ public Long saveEncuesta(EncuestaModel encuesta) {
                 id
         );
     }
+    //  Restaurar una encuesta eliminada logicamente
+    public int restaurar(Long id) {
+        return template.update(
+                "UPDATE Encuestas SET deleted = FALSE WHERE id_departamento = ?",
+                id
+        );
+    }
 }

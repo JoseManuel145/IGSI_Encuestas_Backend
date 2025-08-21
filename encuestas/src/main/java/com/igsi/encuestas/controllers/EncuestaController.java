@@ -83,4 +83,12 @@ public class EncuestaController {
         return eliminado ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
     }
+    // REGRESAR UNA ENCUESTA DEL SOFT-DELETE
+    @PatchMapping("/{id}/restaurar")
+    @PreAuthorize("hasAnyRole('AdminGeneral','Empleado')")
+    public ResponseEntity<Void> restaurar(@PathVariable Long id) {
+        boolean eliminado = service.restaurar(id);
+        return eliminado ? ResponseEntity.noContent().build()
+                : ResponseEntity.notFound().build();
+    }
 }

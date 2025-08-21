@@ -56,4 +56,5 @@ public interface EncuestaService {
      * @return True si la operación fue exitosa, False si no
      */
     boolean softDelete(Long id);
+    boolean restaurar(Long id);
 }
