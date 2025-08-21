@@ -51,7 +51,7 @@ public class DepartamentoController {
             return ResponseEntity.notFound().build(); // 404 si no existe
         }
     }
-    // ELIMINAR DEPARTAMENTO PERMANENTEMENTE
+    // ELIMINAR DEPARTAMENTO (hard delete)
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('AdminGeneral')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
@@ -62,8 +62,8 @@ public class DepartamentoController {
             return ResponseEntity.notFound().build(); // 404
         }
     }
-    // ELIMINAR DEPARTAMENTO LOGICAMENTE
-    @PutMapping("/delete/{id}")
+    // SOFT DELETE DEPARTAMENTO
+    @PatchMapping("/{id}/soft-delete")
     @PreAuthorize("hasRole('AdminGeneral')")
     public ResponseEntity<Void> softDelete(@PathVariable Long id) {
         boolean deleted = service.softDelete(id);
