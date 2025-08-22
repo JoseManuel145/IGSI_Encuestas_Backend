@@ -43,7 +43,9 @@ public class PreguntaRepository {
     public Optional<PreguntaModel> getById(Long idSeccion, Long idPregunta) {
         return template.query(
                 "SELECT * FROM Preguntas WHERE id_seccion = ? AND id_pregunta = ?",
-                preguntaRowMapper
+                preguntaRowMapper,
+                idSeccion,
+                idPregunta
         ).stream().findFirst();
     }
 
