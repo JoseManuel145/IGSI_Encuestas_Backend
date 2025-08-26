@@ -4,6 +4,8 @@ import com.igsi.encuestas.dto.alumnos.request.AlumnoRequest;
 import com.igsi.encuestas.dto.alumnos.response.AlumnoIdResponse;
 import com.igsi.encuestas.dto.alumnos.response.AlumnoLoginResponse;
 import com.igsi.encuestas.dto.alumnos.response.AlumnoResponse;
+import com.igsi.encuestas.exceptions.BadRequestException;
+import com.igsi.encuestas.exceptions.ResourceNotFoundException;
 import com.igsi.encuestas.models.AlumnoModel;
 import com.igsi.encuestas.repositories.AlumnoRepository;
 import com.igsi.encuestas.services.AlumnoService;
@@ -16,7 +18,6 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,7 +31,6 @@ public class AlumnoServiceImpl implements AlumnoService {
     public AlumnoServiceImpl(AlumnoRepository alumnoRepository) {
         this.repository = alumnoRepository;
     }
-// Mapeos
     private AlumnoResponse mapToResponse(AlumnoModel alumno) {
         return new AlumnoResponse(alumno.getIdAlumno(), alumno.getNombre());
     }
@@ -39,49 +39,63 @@ public class AlumnoServiceImpl implements AlumnoService {
     }
     @Override
     public List<AlumnoResponse> getAll() {
-        return repository.getAll().stream()
+        List<AlumnoModel> alumnos = repository.getAll();
+        if (alumnos.isEmpty()) {
+            throw new ResourceNotFoundException("No se encontraron alumnos registrados");
+        }
+        return alumnos.stream().map(this::mapToResponse).collect(Collectors.toList());
+    }
+    @Override
+    public AlumnoIdResponse getById(Long id) {
+        return repository.getById(id)
+                .map(this::mapToIdResponse)
+                .orElseThrow(() -> new ResourceNotFoundException("Alumno con id " + id + " no encontrado"));
+    }
+    @Override
+    public AlumnoResponse getByNombre(String nombre) {
+        if (nombre == null || nombre.isBlank()) {
+            throw new BadRequestException("El nombre del alumno no puede estar vacío");
+        }
+        return repository.getByNombre(nombre)
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
-    }
-    @Override
-    public Optional<AlumnoIdResponse> getById(Long id) {
-        return repository.getById(id).map(this::mapToIdResponse);
-    }
-    @Override
-    public Optional<AlumnoResponse> getByNombre(String nombre) {
-        return repository.getByNombre(nombre).map(this::mapToResponse);
+                .orElseThrow(() -> new ResourceNotFoundException("Alumno con nombre '" + nombre + "' no encontrado"));
     }
     @Override
     public AlumnoResponse save(AlumnoRequest alumnoRequest) {
+        if (alumnoRequest.getNombre() == null || alumnoRequest.getNombre().isBlank()
+                || alumnoRequest.getPassword() == null || alumnoRequest.getPassword().isBlank()) {
+            throw new BadRequestException("Nombre y contraseña son obligatorios para registrar un alumno");
+        }
         AlumnoModel alumno = new AlumnoModel(
-                null, // id será generado por la BD
+                null,
                 alumnoRequest.getNombre(),
                 alumnoRequest.getPassword()
         );
-        // Guardar en BD y obtener el ID generado
         Long idGenerado = repository.save(alumno);
         alumno.setIdAlumno(idGenerado);
-        // Mapear a DTO de respuesta
-        return new AlumnoResponse(alumno.getIdAlumno(), alumno.getNombre());
+
+        return mapToResponse(alumno);
     }
     @Override
     public boolean delete(Long id) {
-        return repository.delete(id) > 0;
+        boolean eliminado = repository.delete(id) > 0;
+        if (!eliminado) {
+            throw new ResourceNotFoundException("Alumno con id " + id + " no encontrado o no pudo eliminarse");
+        }
+        return true;
     }
     @Override
-    public Optional<AlumnoLoginResponse> login(AlumnoRequest alumnoRequest) {
-        // Crear clave segura de al menos 256 bits
-        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-
-        Optional<AlumnoModel> alumnoOpt = repository.getByNombre(alumnoRequest.getNombre());
-        if (alumnoOpt.isEmpty()) return Optional.empty();
-
-        AlumnoModel alumno = alumnoOpt.get();
-        // Validar contraseña
-        if (!alumno.getPassword().equals(alumnoRequest.getPassword())) {
-            return Optional.empty();
+    public AlumnoLoginResponse login(AlumnoRequest alumnoRequest) {
+        if (alumnoRequest.getNombre() == null || alumnoRequest.getPassword() == null) {
+            throw new BadRequestException("Nombre y contraseña son obligatorios para iniciar sesión");
         }
-        // Generar JWT
+        AlumnoModel alumno = repository.getByNombre(alumnoRequest.getNombre())
+                .orElseThrow(() -> new ResourceNotFoundException("Alumno con nombre '" + alumnoRequest.getNombre() + "' no encontrado"));
+
+        if (!alumno.getPassword().equals(alumnoRequest.getPassword())) {
+            throw new BadRequestException("Contraseña incorrecta");
+        }
+        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
         String token = Jwts.builder()
                 .setSubject(alumno.getNombre())
                 .claim("id", alumno.getIdAlumno())
@@ -89,12 +103,6 @@ public class AlumnoServiceImpl implements AlumnoService {
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(key)
                 .compact();
-
-        AlumnoLoginResponse response = new AlumnoLoginResponse(
-                alumno.getIdAlumno(),
-                alumno.getNombre(),
-                token
-        );
-        return Optional.of(response);
+        return new AlumnoLoginResponse(alumno.getIdAlumno(), alumno.getNombre(), token);
     }
 }

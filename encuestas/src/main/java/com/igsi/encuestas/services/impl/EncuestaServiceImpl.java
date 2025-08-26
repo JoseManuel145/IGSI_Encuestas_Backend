@@ -2,13 +2,14 @@ package com.igsi.encuestas.services.impl;
 
 import com.igsi.encuestas.dto.encuesta.request.EncuestaRequest;
 import com.igsi.encuestas.dto.encuesta.response.EncuestaResponse;
+import com.igsi.encuestas.exceptions.BadRequestException;
+import com.igsi.encuestas.exceptions.ResourceNotFoundException;
 import com.igsi.encuestas.models.EncuestaModel;
 import com.igsi.encuestas.repositories.EncuestaRepository;
 import com.igsi.encuestas.services.EncuestaService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,7 +19,6 @@ public class EncuestaServiceImpl implements EncuestaService {
     public EncuestaServiceImpl(EncuestaRepository repository) {
         this.repository = repository;
     }
-// Mapea EncuestaModel a EncuestaResponse
     private EncuestaResponse mapToResponse(EncuestaModel encuesta) {
         EncuestaResponse response = new EncuestaResponse();
         response.setIdEncuesta(encuesta.getIdEncuesta());
@@ -33,46 +33,54 @@ public class EncuestaServiceImpl implements EncuestaService {
     }
     @Override
     public List<EncuestaResponse> getAll() {
-        return repository.getAll().stream()
+        List<EncuestaModel> encuestas = repository.getAll();
+        if (encuestas.isEmpty()) {
+            throw new ResourceNotFoundException("No se encontraron encuestas");
+        }
+        return encuestas.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
     @Override
-    public Optional<EncuestaResponse> getById(Long id) {
-        return repository.getById(id)
-                .map(this::mapToResponse);
+    public EncuestaResponse getById(Long id) {
+        EncuestaModel encuesta = repository.getById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Encuesta con id " + id + " no encontrada"));
+        return mapToResponse(encuesta);
     }
     @Override
     public List<EncuestaResponse> getByDepartamento(Long idDepartamento) {
-        return repository.getByDepartamento(idDepartamento).stream()
+        List<EncuestaModel> encuestas = repository.getByDepartamento(idDepartamento);
+        if (encuestas.isEmpty()) {
+            throw new ResourceNotFoundException("No se encontraron encuestas para el departamento " + idDepartamento);
+        }
+        return encuestas.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
     @Override
     public EncuestaResponse save(EncuestaRequest request) {
-        // Convertir request a model
+        if (request.getTitulo() == null || request.getTitulo().isBlank()) {
+            throw new BadRequestException("El título de la encuesta es obligatorio");
+        }
         EncuestaModel encuesta = new EncuestaModel(
-                null, // se genera en la BD
+                null,
                 request.getTitulo(),
                 request.getDescripcion(),
                 request.getIdDepartamento(),
                 request.getFechaInicio(),
                 request.getFechaFin(),
                 request.getEstado(),
-                false // al crearla, no está eliminada
+                false
         );
-        // Guardar en base de datos
         Long idGenerado = repository.save(encuesta);
         encuesta.setIdEncuesta(idGenerado);
-        // Retornar como response
         return mapToResponse(encuesta);
     }
     @Override
     public boolean update(Long id, EncuestaRequest request) {
-        Optional<EncuestaModel> existing = repository.getById(id);
-        if (existing.isEmpty()) return false;
+        EncuestaModel encuesta = repository.getById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Encuesta con id " + id + " no encontrada"));
 
-        EncuestaModel encuesta = existing.get();
         encuesta.setTitulo(request.getTitulo());
         encuesta.setDescripcion(request.getDescripcion());
         encuesta.setIdDepartamento(request.getIdDepartamento());
@@ -80,18 +88,32 @@ public class EncuestaServiceImpl implements EncuestaService {
         encuesta.setFechaFin(request.getFechaFin());
         encuesta.setEstado(request.getEstado());
 
-        return repository.update(id, encuesta) > 0;
+        boolean updated = repository.update(id, encuesta) > 0;
+        if (!updated) {
+            throw new ResourceNotFoundException("No se pudo actualizar la encuesta con id " + id);
+        }
+        return true;
     }
     @Override
     public boolean delete(Long id) {
-        return repository.delete(id) > 0;
+        boolean deleted = repository.delete(id) > 0;
+        if (!deleted) {
+            throw new ResourceNotFoundException("Encuesta con id " + id + " no encontrada o no se pudo eliminar");
+        }
+        return true;
     }
     @Override
-    public boolean softDelete(Long id) {
-        return repository.softDelete(id) > 0;
+    public void softDelete(Long id) {
+        boolean deleted = repository.softDelete(id) > 0;
+        if (!deleted) {
+            throw new ResourceNotFoundException("Encuesta con id " + id + " no encontrada o no se pudo deshabilitar");
+        }
     }
     @Override
-    public boolean restaurar(Long id) {
-        return repository.restaurar(id) > 0;
+    public void restaurar(Long id) {
+        boolean restored = repository.restaurar(id) > 0;
+        if (!restored) {
+            throw new ResourceNotFoundException("Encuesta con id " + id + " no encontrada o no se pudo restaurar");
+        }
     }
 }

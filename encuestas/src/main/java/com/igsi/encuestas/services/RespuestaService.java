@@ -12,5 +12,4 @@ public interface RespuestaService {
     List<Map<String,Object>> getAll(Long idAlumno, Long idEncuesta);
     boolean update(Long id, RespuestaRequest respuesta);
     boolean delete(Long id);
-    boolean completarEncuesta(Long idEncuesta, Long idAlumno);
 }

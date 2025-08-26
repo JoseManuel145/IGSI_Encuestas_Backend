@@ -6,7 +6,6 @@ import com.igsi.encuestas.dto.usuarios.response.UsuarioLoginResponse;
 import com.igsi.encuestas.dto.usuarios.response.UsuarioResponse;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UsuarioService {
 
@@ -20,14 +19,14 @@ public interface UsuarioService {
      * @param id ID del usuario
      * @return Optional con el usuario si existe, vacío si no
      */
-    Optional<UsuarioResponse> getById(Long id);
+    UsuarioResponse getById(Long id);
 
     /**
      * Busca un usuario por su correo electrónico.
      * @param correo Correo del usuario
      * @return Optional con el usuario si existe, vacío si no
      */
-    Optional<UsuarioResponse> getByCorreo(String correo);
+    UsuarioResponse getByCorreo(String correo);
 
     /**
      * Guarda un nuevo usuario.
@@ -55,5 +54,5 @@ public interface UsuarioService {
      * @param usuarioLoginDto Datos para el incio de sesion
      * @return True si se eliminó, False si no
      */
-    Optional<UsuarioLoginResponse> login(UsuarioLoginRequest usuarioLoginDto);
+    UsuarioLoginResponse login(UsuarioLoginRequest usuarioLoginDto);
 }

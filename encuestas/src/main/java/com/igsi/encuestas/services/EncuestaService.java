@@ -4,7 +4,6 @@ import com.igsi.encuestas.dto.encuesta.request.EncuestaRequest;
 import com.igsi.encuestas.dto.encuesta.response.EncuestaResponse;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface EncuestaService {
 
@@ -19,7 +18,7 @@ public interface EncuestaService {
      * @param id ID de la encuesta
      * @return Optional con la encuesta si existe, vacío si no
      */
-    Optional<EncuestaResponse> getById(Long id);
+    EncuestaResponse getById(Long id);
 
     /**
      * Busca encuestas por ID de departamento.
@@ -53,8 +52,7 @@ public interface EncuestaService {
     /**
      * Elimina una encuesta de forma lógica (soft delete).
      * @param id ID de la encuesta
-     * @return True si la operación fue exitosa, False si no
      */
-    boolean softDelete(Long id);
-    boolean restaurar(Long id);
+    void softDelete(Long id);
+    void restaurar(Long id);
 }

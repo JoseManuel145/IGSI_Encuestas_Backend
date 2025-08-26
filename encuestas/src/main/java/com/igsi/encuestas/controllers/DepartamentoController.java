@@ -9,7 +9,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/departamentos")
@@ -28,9 +27,8 @@ public class DepartamentoController {
 // OBTENER POR ID
     @GetMapping("/{id}")
     public ResponseEntity<DepartamentoResponse> getById(@PathVariable Long id) {
-        Optional<DepartamentoResponse> departamentoDto = service.getById(id);
-        return departamentoDto.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        DepartamentoResponse departamento = service.getById(id);
+        return ResponseEntity.ok(departamento);
     }
 // CREAR DEPARTAMENTO
     @PostMapping
@@ -43,33 +41,21 @@ public class DepartamentoController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('AdminGeneral')")
     public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody DepartamentoRequest dto) {
-        boolean updated = service.update(id, dto);
-        if (updated) {
-            return ResponseEntity.noContent().build(); // 204
-        } else {
-            return ResponseEntity.notFound().build(); // 404 si no existe
-        }
+        service.update(id, dto);
+        return ResponseEntity.noContent().build();
     }
 // ELIMINAR DEPARTAMENTO (hard delete)
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('AdminGeneral')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        boolean deleted = service.delete(id);
-        if (deleted) {
-            return ResponseEntity.noContent().build(); // 204
-        } else {
-            return ResponseEntity.notFound().build(); // 404
-        }
+        service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 // SOFT DELETE DEPARTAMENTO
     @PatchMapping("/{id}/soft-delete")
     @PreAuthorize("hasRole('AdminGeneral')")
     public ResponseEntity<Void> softDelete(@PathVariable Long id) {
-        boolean deleted = service.softDelete(id);
-        if (deleted) {
-            return ResponseEntity.noContent().build(); // 204
-        } else {
-            return ResponseEntity.notFound().build(); // 404
-        }
+        service.softDelete(id);
+        return ResponseEntity.noContent().build();
     }
 }

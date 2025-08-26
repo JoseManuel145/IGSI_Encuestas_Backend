@@ -4,7 +4,6 @@ import com.igsi.encuestas.dto.departamentos.request.DepartamentoRequest;
 import com.igsi.encuestas.dto.departamentos.response.DepartamentoResponse;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface DepartamentoService {
 
@@ -19,7 +18,7 @@ public interface DepartamentoService {
      * @param id ID del departamento
      * @return Optional con el departamento si existe, vacío si no
      */
-    Optional<DepartamentoResponse> getById(Long id);
+    DepartamentoResponse getById(Long id);
 
     /**
      * Guarda un nuevo departamento.
@@ -39,8 +38,7 @@ public interface DepartamentoService {
     /**
      * Elimina un departamento por su ID.
      * @param id ID del departamento
-     * @return True si se eliminó, False si no
      */
-    boolean delete(Long id);
-    boolean softDelete(Long id);
+    void delete(Long id);
+    void softDelete(Long id);
 }

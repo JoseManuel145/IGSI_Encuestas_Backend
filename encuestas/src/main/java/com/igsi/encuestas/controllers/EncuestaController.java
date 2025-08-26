@@ -9,7 +9,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/encuestas")
@@ -22,23 +21,17 @@ public class EncuestaController {
 // LISTAR TODAS
     @GetMapping
     public ResponseEntity<List<EncuestaResponse>> getAll() {
-        List<EncuestaResponse> encuestas = service.getAll();
-        return ResponseEntity.ok(encuestas);
+        return ResponseEntity.ok(service.getAll());
     }
 // OBTENER POR ID
     @GetMapping("/{id}")
     public ResponseEntity<EncuestaResponse> getById(@PathVariable Long id) {
-        Optional<EncuestaResponse> encuestaOpt = service.getById(id);
-        return encuestaOpt.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(service.getById(id));
     }
 // OBTENER POR DEPARTAMENTO
     @GetMapping("/departamento/{idDepartamento}")
     public ResponseEntity<List<EncuestaResponse>> getByDepartamento(@PathVariable Long idDepartamento) {
-        List<EncuestaResponse> encuestas = service.getByDepartamento(idDepartamento);
-        return encuestas.isEmpty()
-                ? ResponseEntity.notFound().build()
-                : ResponseEntity.ok(encuestas);
+        return ResponseEntity.ok(service.getByDepartamento(idDepartamento));
     }
 // CREAR ENCUESTA
     @PostMapping
@@ -52,35 +45,28 @@ public class EncuestaController {
     @PreAuthorize("hasAnyRole('AdminGeneral','Empleado')")
     public ResponseEntity<EncuestaResponse> update(@PathVariable Long id,
                                                    @RequestBody EncuestaRequest encuestaRequest) {
-        boolean actualizado = service.update(id, encuestaRequest);
-        if (!actualizado) return ResponseEntity.notFound().build();
-
-        Optional<EncuestaResponse> encuestaOpt = service.getById(id);
-        return encuestaOpt.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        service.update(id, encuestaRequest);
+        return ResponseEntity.ok(service.getById(id));
     }
 // ELIMINAR ENCUESTA (hard delete)
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('AdminGeneral')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        boolean eliminado = service.delete(id);
-        return eliminado ? ResponseEntity.noContent().build()
-                : ResponseEntity.notFound().build();
+        service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 // SOFT DELETE ENCUESTA
     @PatchMapping("/{id}/soft-delete")
     @PreAuthorize("hasAnyRole('AdminGeneral','Empleado')")
     public ResponseEntity<Void> softDelete(@PathVariable Long id) {
-        boolean eliminado = service.softDelete(id);
-        return eliminado ? ResponseEntity.noContent().build()
-                : ResponseEntity.notFound().build();
+        service.softDelete(id);
+        return ResponseEntity.noContent().build();
     }
-// REGRESAR UNA ENCUESTA DEL SOFT-DELETE
+// RESTAURAR ENCUESTA
     @PatchMapping("/{id}/restaurar")
     @PreAuthorize("hasAnyRole('AdminGeneral','Empleado')")
     public ResponseEntity<Void> restaurar(@PathVariable Long id) {
-        boolean eliminado = service.restaurar(id);
-        return eliminado ? ResponseEntity.noContent().build()
-                : ResponseEntity.notFound().build();
+        service.restaurar(id);
+        return ResponseEntity.noContent().build();
     }
 }

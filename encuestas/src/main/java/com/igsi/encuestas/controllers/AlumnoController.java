@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/alumnos")
@@ -29,16 +28,14 @@ public class AlumnoController {
 // OBTENER ALUMNO POR ID
     @GetMapping("/{id}")
     public ResponseEntity<AlumnoIdResponse> getById(@PathVariable Long id) {
-        Optional<AlumnoIdResponse> alumnoOpt = service.getById(id);
-        return alumnoOpt.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        AlumnoIdResponse alumno = service.getById(id);
+        return ResponseEntity.ok(alumno);
     }
 // OBTENER ALUMNO POR NOMBRE
     @GetMapping("/nombre/{nombre}")
     public ResponseEntity<AlumnoResponse> getByNombre(@PathVariable String nombre) {
-        Optional<AlumnoResponse> alumnoOpt = service.getByNombre(nombre);
-        return alumnoOpt.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        AlumnoResponse alumno = service.getByNombre(nombre);
+        return ResponseEntity.ok(alumno);
     }
 // REGISTRAR UN ALUMNO
     @PostMapping
@@ -49,18 +46,13 @@ public class AlumnoController {
 // ELIMINAR UN ALUMNO
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        boolean deleted = service.delete(id);
-        if (deleted) {
-            return ResponseEntity.noContent().build(); // 204
-        } else {
-            return ResponseEntity.notFound().build(); // 404
-        }
+        service.delete(id); // Lanza excepción si no existe
+        return ResponseEntity.noContent().build(); // 204
     }
 // LOGIN
     @PostMapping("/login")
     public ResponseEntity<AlumnoLoginResponse> login(@RequestBody AlumnoRequest request) {
-        Optional<AlumnoLoginResponse> tokenOpt = service.login(request);
-        return tokenOpt.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+        AlumnoLoginResponse token = service.login(request);
+        return ResponseEntity.ok(token);
     }
 }

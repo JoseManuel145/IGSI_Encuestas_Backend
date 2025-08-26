@@ -60,8 +60,4 @@ public class RespuestaServiceImpl implements RespuestaService {
     public boolean delete(Long id) {
         return repository.delete(id) > 0;
     }
-    @Override
-    public boolean completarEncuesta(Long idEncuesta, Long idAlumno) {
-        return repository.complete(idEncuesta, idAlumno) > 0;
-    }
 }

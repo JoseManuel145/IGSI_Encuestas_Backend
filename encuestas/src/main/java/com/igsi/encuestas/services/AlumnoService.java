@@ -6,7 +6,6 @@ import com.igsi.encuestas.dto.alumnos.response.AlumnoLoginResponse;
 import com.igsi.encuestas.dto.alumnos.response.AlumnoResponse;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface AlumnoService {
 
@@ -21,14 +20,14 @@ public interface AlumnoService {
      * @param id ID del alumno
      * @return Optional con el alumno si existe, vacío si no
      */
-    Optional<AlumnoIdResponse> getById(Long id);
+    AlumnoIdResponse getById(Long id);
 
     /**
      * Busca un alumno por su ID.
      * @param nombre ID del alumno
      * @return Optional con el alumno si existe, vacío si no
      */
-    Optional<AlumnoResponse> getByNombre(String nombre);
+    AlumnoResponse getByNombre(String nombre);
 
     /**
      * Guarda un nuevo alumno.
@@ -49,5 +48,5 @@ public interface AlumnoService {
      * @param alumnoDto Esquema del alumno para hacer login
      * @return Optional con el alumno si las credenciales son correctas
      */
-    Optional<AlumnoLoginResponse> login(AlumnoRequest alumnoDto);
+    AlumnoLoginResponse login(AlumnoRequest alumnoDto);
 }

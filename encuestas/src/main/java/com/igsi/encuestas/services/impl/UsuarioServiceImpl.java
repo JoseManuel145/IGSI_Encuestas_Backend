@@ -4,6 +4,8 @@ import com.igsi.encuestas.dto.usuarios.request.UsuarioLoginRequest;
 import com.igsi.encuestas.dto.usuarios.request.UsuarioRequest;
 import com.igsi.encuestas.dto.usuarios.response.UsuarioLoginResponse;
 import com.igsi.encuestas.dto.usuarios.response.UsuarioResponse;
+import com.igsi.encuestas.exceptions.BadRequestException;
+import com.igsi.encuestas.exceptions.ResourceNotFoundException;
 import com.igsi.encuestas.models.UsuarioModel;
 import com.igsi.encuestas.repositories.UsuarioRepository;
 import com.igsi.encuestas.services.UsuarioService;
@@ -17,7 +19,6 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,7 +33,6 @@ public class UsuarioServiceImpl implements UsuarioService {
         this.repository = usuarioRepository;
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
-// Mapea UsuarioModel -> UsuarioResponse
     private UsuarioResponse mapToResponse(UsuarioModel usuario) {
         return new UsuarioResponse(
                 usuario.getIdUsuario(),
@@ -44,22 +44,35 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
     @Override
     public List<UsuarioResponse> getAll() {
-        return repository.getAll().stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+        List<UsuarioModel> usuarios = repository.getAll();
+        if (usuarios.isEmpty()) {
+            throw new ResourceNotFoundException("No se encontraron usuarios registrados");
+        }
+        return usuarios.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
     @Override
-    public Optional<UsuarioResponse> getById(Long id) {
-        return repository.getById(id).map(this::mapToResponse);
+    public UsuarioResponse getById(Long id) {
+        UsuarioModel usuario = repository.getById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario con id " + id + " no encontrado"));
+        return mapToResponse(usuario);
     }
     @Override
-    public Optional<UsuarioResponse> getByCorreo(String correo) {
-        return repository.getByCorreo(correo).map(this::mapToResponse);
+    public UsuarioResponse getByCorreo(String correo) {
+        if (correo == null || correo.isBlank()) {
+            throw new BadRequestException("Correo no puede estar vacío");
+        }
+        UsuarioModel usuario = repository.getByCorreo(correo)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario con correo '" + correo + "' no encontrado"));
+        return mapToResponse(usuario);
     }
     @Override
     public UsuarioResponse save(UsuarioRequest usuarioRequest) {
+        if (usuarioRequest.getNombre() == null || usuarioRequest.getNombre().isBlank() ||
+                usuarioRequest.getCorreo() == null || usuarioRequest.getCorreo().isBlank() ||
+                usuarioRequest.getPassword() == null || usuarioRequest.getPassword().isBlank()) {
+            throw new BadRequestException("Nombre, correo y contraseña son obligatorios");
+        }
         String hashedPassword = passwordEncoder.encode(usuarioRequest.getPassword());
-
         UsuarioModel usuario = new UsuarioModel(
                 null,
                 usuarioRequest.getNombre(),
@@ -68,16 +81,15 @@ public class UsuarioServiceImpl implements UsuarioService {
                 usuarioRequest.getRol(),
                 usuarioRequest.getIdDepartamento()
         );
-        Long iDGenerado = repository.saveUser(usuario);
-        usuario.setIdUsuario(iDGenerado);
+        Long idGenerado = repository.saveUser(usuario);
+        usuario.setIdUsuario(idGenerado);
         return mapToResponse(usuario);
     }
     @Override
     public boolean update(Long id, UsuarioRequest usuarioRequest) {
-        Optional<UsuarioModel> existing = repository.getById(id);
-        if (existing.isEmpty()) return false;
+        UsuarioModel usuario = repository.getById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario con id " + id + " no encontrado"));
 
-        UsuarioModel usuario = existing.get();
         usuario.setNombre(usuarioRequest.getNombre());
         usuario.setCorreo(usuarioRequest.getCorreo());
         if (usuarioRequest.getPassword() != null && !usuarioRequest.getPassword().isEmpty()) {
@@ -86,23 +98,30 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario.setRol(usuarioRequest.getRol());
         usuario.setIdDepartamento(usuarioRequest.getIdDepartamento());
 
-        return repository.updateUser(usuario) > 0;
+        boolean updated = repository.updateUser(usuario) > 0;
+        if (!updated) throw new BadRequestException("No se pudo actualizar el usuario con id " + id);
+        return true;
     }
     @Override
     public boolean delete(Long id) {
-        return repository.delete(id) > 0;
+        boolean deleted = repository.delete(id) > 0;
+        if (!deleted) {
+            throw new ResourceNotFoundException("Usuario con id " + id + " no encontrado o no pudo eliminarse");
+        }
+        return true;
     }
     @Override
-    public Optional<UsuarioLoginResponse> login(UsuarioLoginRequest loginRequest) {
-        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-
-        Optional<UsuarioModel> usuarioOpt = repository.getByCorreo(loginRequest.getCorreo());
-        if (usuarioOpt.isEmpty()) return Optional.empty();
-
-        UsuarioModel usuario = usuarioOpt.get();
-        if (!passwordEncoder.matches(loginRequest.getPassword(), usuario.getPassword())) {
-            return Optional.empty();
+    public UsuarioLoginResponse login(UsuarioLoginRequest loginRequest) {
+        if (loginRequest.getCorreo() == null || loginRequest.getPassword() == null) {
+            throw new BadRequestException("Correo y contraseña son obligatorios para iniciar sesión");
         }
+        UsuarioModel usuario = repository.getByCorreo(loginRequest.getCorreo())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario con correo '" + loginRequest.getCorreo() + "' no encontrado"));
+
+        if (!passwordEncoder.matches(loginRequest.getPassword(), usuario.getPassword())) {
+            throw new BadRequestException("Contraseña incorrecta");
+        }
+        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
         String token = Jwts.builder()
                 .setSubject(usuario.getCorreo())
                 .claim("rol", usuario.getRol())
@@ -111,8 +130,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(key)
                 .compact();
-
-        UsuarioLoginResponse response = new UsuarioLoginResponse(
+        return new UsuarioLoginResponse(
                 usuario.getIdUsuario(),
                 usuario.getNombre(),
                 usuario.getCorreo(),
@@ -120,6 +138,5 @@ public class UsuarioServiceImpl implements UsuarioService {
                 usuario.getIdDepartamento(),
                 token
         );
-        return Optional.of(response);
     }
 }

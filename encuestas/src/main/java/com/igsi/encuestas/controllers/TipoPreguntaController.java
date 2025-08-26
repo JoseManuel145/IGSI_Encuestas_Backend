@@ -24,9 +24,7 @@ public class TipoPreguntaController {
 // Obtener un tipo de pregunta por ID
     @GetMapping("/{id}")
     public ResponseEntity<TipoPreguntaResponse> getById(@PathVariable Long id) {
-        return service.getById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(service.getById(id));
     }
 // Crear un nuevo tipo de pregunta
     @PostMapping

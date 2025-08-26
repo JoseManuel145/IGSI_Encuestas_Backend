@@ -1,20 +1,19 @@
 package com.igsi.encuestas.services.impl;
 
 import com.igsi.encuestas.dto.encuesta.response.SeccionEncuestaResponse;
+import com.igsi.encuestas.exceptions.ResourceNotFoundException;
 import com.igsi.encuestas.models.SeccionEncuestaModel;
 import com.igsi.encuestas.repositories.SeccionEncuestaRepository;
 import com.igsi.encuestas.services.SeccionEncuestaService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class SeccionEncuestaServiceImpl implements SeccionEncuestaService {
 
     private final SeccionEncuestaRepository repository;
-
     public SeccionEncuestaServiceImpl(SeccionEncuestaRepository repository) {
         this.repository = repository;
     }
@@ -29,20 +28,27 @@ public class SeccionEncuestaServiceImpl implements SeccionEncuestaService {
     }
     @Override
     public List<SeccionEncuestaResponse> getAll(Long idEncuesta) {
-        return repository.getAll(idEncuesta)
-                .stream()
-                .map(this::mapToResponse).collect(Collectors.toList());
+        List<SeccionEncuestaModel> secciones = repository.getAll(idEncuesta);
+        if (secciones.isEmpty()) {
+            throw new ResourceNotFoundException("No se encontraron secciones para la encuesta " + idEncuesta);
+        }
+        return secciones.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
     @Override
-    public Optional<SeccionEncuestaResponse> getById(Long idEncuesta, Long idSeccion) {
-        return repository.getById(idEncuesta, idSeccion)
-                .map(this::mapToResponse);
+    public SeccionEncuestaResponse getById(Long idEncuesta, Long idSeccion) {
+        SeccionEncuestaModel seccion = repository.getById(idEncuesta, idSeccion)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Sección con id " + idSeccion + " no encontrada en la encuesta " + idEncuesta
+                ));
+        return mapToResponse(seccion);
     }
     @Override
     public Long save(SeccionEncuestaResponse seccion) {
-        // Convertir response a model antes de guardar
+        if (seccion.getTitulo() == null || seccion.getTitulo().isBlank()) {
+            throw new IllegalArgumentException("El título de la sección no puede estar vacío");
+        }
         SeccionEncuestaModel model = new SeccionEncuestaModel(
-                null, // id autogenerado
+                null,
                 seccion.getIdEncuesta(),
                 seccion.getTitulo(),
                 seccion.getDescripcion(),
@@ -53,19 +59,30 @@ public class SeccionEncuestaServiceImpl implements SeccionEncuestaService {
         return idGenerado;
     }
     @Override
-    public int update(Long idEncuesta,Long idSeccion, SeccionEncuestaResponse seccion) {
-        Optional<SeccionEncuestaModel> existing = repository.getById(idEncuesta, idSeccion);
-        if (existing.isEmpty()) return 0;
+    public boolean update(Long idEncuesta, Long idSeccion, SeccionEncuestaResponse seccion) {
+        SeccionEncuestaModel existing = repository.getById(idEncuesta, idSeccion)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Sección con id " + idSeccion + " no encontrada en la encuesta " + idEncuesta
+                ));
 
-        SeccionEncuestaModel model = existing.get();
-        model.setTitulo(seccion.getTitulo());
-        model.setDescripcion(seccion.getDescripcion());
-        model.setOrden(seccion.getOrden());
+        existing.setTitulo(seccion.getTitulo());
+        existing.setDescripcion(seccion.getDescripcion());
+        existing.setOrden(seccion.getOrden());
 
-        return repository.update(idSeccion, model);
+        int updated = repository.update(idSeccion, existing);
+        if (updated <= 0) {
+            throw new IllegalStateException("No se pudo actualizar la sección con id " + idSeccion);
+        }
+        return true;
     }
     @Override
-    public int delete(Long idEncuesta, Long idSeccion) {
-        return repository.delete(idSeccion);
+    public boolean delete(Long idEncuesta, Long idSeccion) {
+        int deleted = repository.delete(idSeccion);
+        if (deleted <= 0) {
+            throw new ResourceNotFoundException(
+                    "Sección con id " + idSeccion + " no encontrada o no pudo eliminarse"
+            );
+        }
+        return true;
     }
 }

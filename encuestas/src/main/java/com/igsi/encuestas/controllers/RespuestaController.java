@@ -40,13 +40,4 @@ public class RespuestaController {
         boolean updated = service.update(idRespuesta, request);
         return updated ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
-    @PostMapping("/complete")
-    public ResponseEntity<RespuestaResponse> completarEncuesta(
-            @PathVariable Long idEncuesta,
-            @PathVariable Long idAlumno,
-            @PathVariable Long idPregunta
-    ) {
-        boolean complete = service.completarEncuesta(idEncuesta, idAlumno);
-        return complete ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
-    }
 }

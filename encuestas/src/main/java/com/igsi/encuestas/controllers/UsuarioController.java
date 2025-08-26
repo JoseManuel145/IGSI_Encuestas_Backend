@@ -11,7 +11,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -21,58 +20,38 @@ public class UsuarioController {
     public UsuarioController(UsuarioService usuarioService) {
         this.service = usuarioService;
     }
-// LISTAR USUARIOS
     @GetMapping
     public ResponseEntity<List<UsuarioResponse>> getAll() {
-        List<UsuarioResponse> usuarios = service.getAll();
-        return ResponseEntity.ok(usuarios);
+        return ResponseEntity.ok(service.getAll());
     }
-// OBTENER POR ID
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponse> getById(@PathVariable Long id) {
-        Optional<UsuarioResponse> usuarioOpt = service.getById(id);
-        return usuarioOpt.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(service.getById(id));
     }
-// OBTENER POR CORREO
     @GetMapping("/correo/{correo}")
     public ResponseEntity<UsuarioResponse> getByCorreo(@PathVariable String correo) {
-        Optional<UsuarioResponse> usuarioOpt = service.getByCorreo(correo);
-        return usuarioOpt.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(service.getByCorreo(correo));
     }
-// CREAR USUARIO
     @PostMapping
     @PreAuthorize("hasRole('AdminGeneral')")
     public ResponseEntity<UsuarioResponse> create(@RequestBody UsuarioRequest usuarioRequest) {
-        UsuarioResponse nuevoUsuario = service.save(usuarioRequest);
-        return new ResponseEntity<>(nuevoUsuario, HttpStatus.CREATED);
+        return new ResponseEntity<>(service.save(usuarioRequest), HttpStatus.CREATED);
     }
-// ACTUALIZAR USUARIO
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('AdminGeneral')")
     public ResponseEntity<UsuarioResponse> update(@PathVariable Long id,
                                                   @RequestBody UsuarioRequest usuarioRequest) {
-        boolean actualizado = service.update(id, usuarioRequest);
-        if (!actualizado) return ResponseEntity.notFound().build();
-
-        Optional<UsuarioResponse> usuarioOpt = service.getById(id);
-        return usuarioOpt.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        service.update(id, usuarioRequest);
+        return ResponseEntity.ok(service.getById(id));
     }
-// ELIMINAR USUARIO
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('AdminGeneral')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        boolean eliminado = service.delete(id);
-        return eliminado ? ResponseEntity.noContent().build()
-                : ResponseEntity.notFound().build();
+        service.delete(id);
+        return ResponseEntity.noContent().build();
     }
-// LOGIN
     @PostMapping("/login")
     public ResponseEntity<UsuarioLoginResponse> login(@RequestBody UsuarioLoginRequest loginRequest) {
-        Optional<UsuarioLoginResponse> tokenOpt = service.login(loginRequest);
-        return tokenOpt.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+        return ResponseEntity.ok(service.login(loginRequest));
     }
 }
