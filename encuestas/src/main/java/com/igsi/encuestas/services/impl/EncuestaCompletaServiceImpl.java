@@ -13,11 +13,9 @@ import java.util.stream.Collectors;
 public class EncuestaCompletaServiceImpl implements EncuestaCompletaService {
 
     private final EncuestaCompletaRepository repository;
-
     public EncuestaCompletaServiceImpl(EncuestaCompletaRepository repository) {
         this.repository = repository;
     }
-
     // Mapea EncuestaModel a EncuestaCompletaResponse
     private EncuestaCompletaResponse mapToResponse(EncuestaModel encuesta) {
         EncuestaCompletaResponse response = new EncuestaCompletaResponse();
@@ -29,9 +27,8 @@ public class EncuestaCompletaServiceImpl implements EncuestaCompletaService {
         response.setFechaFin(encuesta.getFechaFin());
         response.setEstado(encuesta.getEstado());
         response.setDeleted(encuesta.getDeleted());
-
         // Secciones
-        List<SeccionEncuestaModel> secciones = repository.getSecciones(encuesta.getIdEncuesta());
+        List<SeccionEncuestaModel> secciones = repository.getAllSecciones(encuesta.getIdEncuesta());
 
         List<SeccionResponse> seccionesResp = secciones.stream().map(seccion -> {
             SeccionResponse sResp = new SeccionResponse();
@@ -41,7 +38,7 @@ public class EncuestaCompletaServiceImpl implements EncuestaCompletaService {
             sResp.setOrden(seccion.getOrden());
 
             // Preguntas
-            List<PreguntaModel> preguntas = repository.getPreguntas(seccion.getIdSeccion());
+            List<PreguntaModel> preguntas = repository.getAllPreguntas(seccion.getIdSeccion());
             List<PreguntaResponse> preguntasResp = preguntas.stream().map(pregunta -> {
                 PreguntaResponse pResp = new PreguntaResponse();
                 pResp.setIdPregunta(pregunta.getIdPregunta());
@@ -52,7 +49,7 @@ public class EncuestaCompletaServiceImpl implements EncuestaCompletaService {
                 pResp.setPuntaje(pregunta.getPuntaje());
 
                 // Respuestas posibles
-                List<RespuestaPosibleModel> respuestas = repository.getRespuestas(pregunta.getIdPregunta());
+                List<RespuestaPosibleModel> respuestas = repository.getAllRespuestas(pregunta.getIdPregunta());
                 List<RespuestaPosibleResponse> respuestasResp = respuestas.stream().map(r -> {
                     RespuestaPosibleResponse rResp = new RespuestaPosibleResponse();
                     rResp.setIdRespuestaPosible(r.getIdRespuestaPosible());
@@ -74,11 +71,10 @@ public class EncuestaCompletaServiceImpl implements EncuestaCompletaService {
         response.setSecciones(seccionesResp);
         return response;
     }
-
     @Override
-    public EncuestaCompletaResponse getEncuestaCompleta(Long idEncuesta) {
-        return repository.getEncuesta(idEncuesta) != null
-                ? mapToResponse(repository.getEncuesta(idEncuesta))
+    public EncuestaCompletaResponse GetCompleta(Long idEncuesta) {
+        return repository.getById(idEncuesta) != null
+                ? mapToResponse(repository.getById(idEncuesta))
                 : null;
     }
 }

@@ -15,12 +15,10 @@ import java.util.stream.Collectors;
 public class EncuestaServiceImpl implements EncuestaService {
 
     private final EncuestaRepository repository;
-
     public EncuestaServiceImpl(EncuestaRepository repository) {
         this.repository = repository;
     }
-
-    // Mapea EncuestaModel a EncuestaResponse
+// Mapea EncuestaModel a EncuestaResponse
     private EncuestaResponse mapToResponse(EncuestaModel encuesta) {
         EncuestaResponse response = new EncuestaResponse();
         response.setIdEncuesta(encuesta.getIdEncuesta());
@@ -33,27 +31,23 @@ public class EncuestaServiceImpl implements EncuestaService {
         response.setDeleted(encuesta.getDeleted());
         return response;
     }
-
     @Override
     public List<EncuestaResponse> getAll() {
         return repository.getAll().stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
-
     @Override
     public Optional<EncuestaResponse> getById(Long id) {
         return repository.getById(id)
                 .map(this::mapToResponse);
     }
-
     @Override
     public List<EncuestaResponse> getByDepartamento(Long idDepartamento) {
         return repository.getByDepartamento(idDepartamento).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
-
     @Override
     public EncuestaResponse save(EncuestaRequest request) {
         // Convertir request a model
@@ -67,15 +61,12 @@ public class EncuestaServiceImpl implements EncuestaService {
                 request.getEstado(),
                 false // al crearla, no está eliminada
         );
-
         // Guardar en base de datos
-        Long idGenerado = repository.saveEncuesta(encuesta);
+        Long idGenerado = repository.save(encuesta);
         encuesta.setIdEncuesta(idGenerado);
-
         // Retornar como response
         return mapToResponse(encuesta);
     }
-
     @Override
     public boolean update(Long id, EncuestaRequest request) {
         Optional<EncuestaModel> existing = repository.getById(id);
@@ -89,14 +80,12 @@ public class EncuestaServiceImpl implements EncuestaService {
         encuesta.setFechaFin(request.getFechaFin());
         encuesta.setEstado(request.getEstado());
 
-        return repository.updateEncuesta(id, encuesta) > 0;
+        return repository.update(id, encuesta) > 0;
     }
-
     @Override
     public boolean delete(Long id) {
         return repository.delete(id) > 0;
     }
-
     @Override
     public boolean softDelete(Long id) {
         return repository.softDelete(id) > 0;
@@ -105,5 +94,4 @@ public class EncuestaServiceImpl implements EncuestaService {
     public boolean restaurar(Long id) {
         return repository.restaurar(id) > 0;
     }
-
 }

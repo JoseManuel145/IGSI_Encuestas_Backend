@@ -35,7 +35,7 @@ public class RespuestaPosibleRepository {
         );
     }
 //  Crear una respuesta de una pregunta
-    public Long saveRespuesta(RespuestaPosibleModel respuestaPosible) {
+    public Long save(RespuestaPosibleModel respuestaPosible) {
         KeyHolder holder = new GeneratedKeyHolder();
 
         template.update(con -> {
@@ -53,9 +53,8 @@ public class RespuestaPosibleRepository {
         }, holder);
         return holder.getKey().longValue();
     }
-
-    // Actualizar una respuesta posible de una pregunta
-    public int updateRespuesta(Long idRespuestaPosible, RespuestaPosibleModel respuesta) {
+// Actualizar una respuesta posible de una pregunta
+    public int update(Long idRespuestaPosible, RespuestaPosibleModel respuesta) {
         return template.update(
                 "UPDATE Respuestas_Posibles " +
                         "SET id_pregunta = ?, texto_respuesta = ?, puntaje = ?, es_correcta = ? " +
@@ -67,8 +66,7 @@ public class RespuestaPosibleRepository {
                 idRespuestaPosible
         );
     }
-
-    //  Eliminar una respuesta posible de una pregunta
+//  Eliminar una respuesta posible de una pregunta
     public int delete(Long idRespuestaPosible) {
         return template.update(
                 "DELETE FROM Respuestas_Posibles WHERE id_respuesta_posible = ?",

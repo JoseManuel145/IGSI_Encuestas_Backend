@@ -14,11 +14,9 @@ import java.util.stream.Collectors;
 public class RespuestaPosibleServiceImpl implements RespuestaPosibleService {
 
     private final RespuestaPosibleRepository repository;
-
     public RespuestaPosibleServiceImpl(RespuestaPosibleRepository repository) {
         this.repository = repository;
     }
-
     private RespuestaPosibleResponse mapToResponse(RespuestaPosibleModel model) {
         RespuestaPosibleResponse response = new RespuestaPosibleResponse();
         response.setIdRespuestaPosible(model.getIdRespuestaPosible());
@@ -28,7 +26,6 @@ public class RespuestaPosibleServiceImpl implements RespuestaPosibleService {
         response.setEsCorrecta(model.getEsCorrecta());
         return response;
     }
-
     @Override
     public List<RespuestaPosibleResponse> getAll(Long idPregunta) {
         return repository.getAll(idPregunta)
@@ -36,7 +33,6 @@ public class RespuestaPosibleServiceImpl implements RespuestaPosibleService {
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
-
     @Override
     public RespuestaPosibleResponse save(Long idPregunta, RespuestaPosibleRequest request) {
         // Convertir Request a Model
@@ -47,13 +43,11 @@ public class RespuestaPosibleServiceImpl implements RespuestaPosibleService {
                 request.getPuntaje(),
                 request.getEsCorrecta()
         );
-
-        Long idGenerado = repository.saveRespuesta(model);
+        Long idGenerado = repository.save(model);
         model.setIdRespuestaPosible(idGenerado);
 
         return mapToResponse(model);
     }
-
     @Override
     public boolean update(Long idPregunta, Long idRespuesta, RespuestaPosibleRequest request) {
         RespuestaPosibleModel model = new RespuestaPosibleModel(
@@ -63,10 +57,8 @@ public class RespuestaPosibleServiceImpl implements RespuestaPosibleService {
                 request.getPuntaje(),
                 request.getEsCorrecta()
         );
-
-        return repository.updateRespuesta(idRespuesta, model) > 0;
+        return repository.update(idRespuesta, model) > 0;
     }
-
     @Override
     public boolean delete(Long idPregunta, Long idRespuesta) {
         return repository.delete(idRespuesta) > 0;

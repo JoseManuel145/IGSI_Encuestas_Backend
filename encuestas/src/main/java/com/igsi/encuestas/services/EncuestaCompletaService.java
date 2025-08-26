@@ -8,5 +8,5 @@ public interface EncuestaCompletaService {
      * @param idEncuesta - Id de la encuesta
      * @return Encuesta completa
      */
-    EncuestaCompletaResponse getEncuestaCompleta(Long idEncuesta);
+    EncuestaCompletaResponse GetCompleta(Long idEncuesta);
 }

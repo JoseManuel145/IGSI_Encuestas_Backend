@@ -15,11 +15,9 @@ import java.util.Optional;
 @Repository
 public class SeccionEncuestaRepository {
     private final JdbcTemplate template;
-
     public SeccionEncuestaRepository(JdbcTemplate jdbcTemplate) {
         this.template = jdbcTemplate;
     }
-
     private final RowMapper<SeccionEncuestaModel> seccionRowMapper = (rs, rowNum) -> new SeccionEncuestaModel(
             rs.getObject("id_seccion", Long.class),
             rs.getObject("id_encuesta", Long.class),
@@ -27,8 +25,7 @@ public class SeccionEncuestaRepository {
             rs.getString("descripcion"),
             rs.getObject("orden", Integer.class)
     );
-
-    // Listar todas las secciones de una encuesta
+// Listar todas las secciones de una encuesta
     public List<SeccionEncuestaModel> getAll(Long idEncuesta) {
         return template.query(
                 "SELECT * FROM Secciones_Encuesta WHERE id_encuesta = ?",
@@ -36,8 +33,7 @@ public class SeccionEncuestaRepository {
                 idEncuesta
         );
     }
-
-    // Buscar una sección
+// Buscar una sección
     public Optional<SeccionEncuestaModel> getById(Long idEncuesta, Long idSeccion) {
         return template.query(
                 "SELECT * FROM Secciones_Encuesta WHERE id_seccion = ? AND id_encuesta = ?",
@@ -46,9 +42,8 @@ public class SeccionEncuestaRepository {
                 idEncuesta
         ).stream().findFirst();
     }
-
-    // Crear una sección
-    public Long saveSeccion(SeccionEncuestaModel seccion) {
+// Crear una sección
+    public Long save(SeccionEncuestaModel seccion) {
         KeyHolder holder = new GeneratedKeyHolder();
 
         template.update(con -> {
@@ -65,9 +60,8 @@ public class SeccionEncuestaRepository {
 
         return holder.getKey().longValue();
     }
-
-    // Actualizar sección
-    public int updateSeccion(Long idSeccion, SeccionEncuestaModel seccion) {
+// Actualizar sección
+    public int update(Long idSeccion, SeccionEncuestaModel seccion) {
         return template.update(
                 "UPDATE Secciones_Encuesta " +
                         "SET titulo = ?, descripcion = ?, orden = ? " +
@@ -78,13 +72,11 @@ public class SeccionEncuestaRepository {
                 idSeccion
         );
     }
-
-    // Eliminar sección
+// Eliminar sección
     public int delete(Long idSeccion) {
         return template.update(
                 "DELETE FROM Secciones_Encuesta WHERE id_seccion = ?",
                 idSeccion
         );
     }
-
 }

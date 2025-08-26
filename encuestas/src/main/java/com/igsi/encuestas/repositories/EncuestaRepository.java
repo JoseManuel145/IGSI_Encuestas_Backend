@@ -45,8 +45,7 @@ public class EncuestaRepository {
                 id
         ).stream().findFirst();
     }
-
-    //  Buscar por Departamento
+//  Buscar por Departamento
     public List<EncuestaModel> getByDepartamento(Long id) {
         return template.query(
                 "SELECT * FROM Encuestas WHERE id_departamento = ? AND deleted = FALSE ORDER BY id_encuesta DESC",
@@ -55,29 +54,29 @@ public class EncuestaRepository {
         ).stream().toList();
     }
 //  Crear una encuesta
-public Long saveEncuesta(EncuestaModel encuesta) {
-    KeyHolder keyHolder = new GeneratedKeyHolder();
+    public Long save(EncuestaModel encuesta) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
 
-    template.update(connection -> {
-        PreparedStatement ps = connection.prepareStatement(
-                "INSERT INTO Encuestas(titulo, descripcion, id_departamento, fecha_inicio, fecha_fin, estado, deleted) " +
-                        "VALUES (?,?,?,?,?,?,?)",
-                Statement.RETURN_GENERATED_KEYS
-        );
-        ps.setString(1, encuesta.getTitulo());
-        ps.setString(2, encuesta.getDescripcion());
-        ps.setLong(3, encuesta.getIdDepartamento());
-        ps.setDate(4, java.sql.Date.valueOf(encuesta.getFechaInicio()));
-        ps.setDate(5, java.sql.Date.valueOf(encuesta.getFechaFin()));
-        ps.setString(6, encuesta.getEstado());
-        ps.setBoolean(7, encuesta.getDeleted() != null ? encuesta.getDeleted() : false);
-        return ps;
-    }, keyHolder);
+        template.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(
+                    "INSERT INTO Encuestas(titulo, descripcion, id_departamento, fecha_inicio, fecha_fin, estado, deleted) " +
+                            "VALUES (?,?,?,?,?,?,?)",
+                    Statement.RETURN_GENERATED_KEYS
+            );
+            ps.setString(1, encuesta.getTitulo());
+            ps.setString(2, encuesta.getDescripcion());
+            ps.setLong(3, encuesta.getIdDepartamento());
+            ps.setDate(4, java.sql.Date.valueOf(encuesta.getFechaInicio()));
+            ps.setDate(5, java.sql.Date.valueOf(encuesta.getFechaFin()));
+            ps.setString(6, encuesta.getEstado());
+            ps.setBoolean(7, encuesta.getDeleted() != null ? encuesta.getDeleted() : false);
+            return ps;
+        }, keyHolder);
 
-    return keyHolder.getKey().longValue();
-}
+        return keyHolder.getKey().longValue();
+    }
 //  Actualizar una encuesta
-    public int updateEncuesta(Long id, EncuestaModel encuesta) {
+    public int update(Long id, EncuestaModel encuesta) {
         return template.update(
                 "UPDATE Encuestas " +
                       "SET titulo = ?, descripcion = ?, id_departamento = ?, fecha_inicio = ?, fecha_fin = ?, estado = ?, deleted = ? " +
@@ -92,7 +91,6 @@ public Long saveEncuesta(EncuestaModel encuesta) {
                 id
         );
     }
-
 //  Eliminar una encuesta de forma permanente
     public int delete(Long id) {
         return template.update(

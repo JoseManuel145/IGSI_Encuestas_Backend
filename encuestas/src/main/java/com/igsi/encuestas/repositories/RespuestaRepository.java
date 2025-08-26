@@ -16,11 +16,9 @@ import java.util.Optional;
 @Repository
 public class RespuestaRepository {
     private final JdbcTemplate template;
-
     public RespuestaRepository(JdbcTemplate jdbcTemplate) {
         this.template = jdbcTemplate;
     }
-
     private final RowMapper<RespuestaModel> rowMapper = (rs, rowNum) -> new RespuestaModel(
             rs.getObject("id_respuesta_alumno", Long.class),
             rs.getObject("id_alumno", Long.class),
@@ -28,9 +26,8 @@ public class RespuestaRepository {
             rs.getObject("id_respuesta_posible", Long.class),
             rs.getString("respuesta_abierta")
     );
-
-    // CREATE
-    public Long saveRespuesta(RespuestaModel respuestaPosible) {
+// CREATE
+    public Long save(RespuestaModel respuestaPosible) {
         KeyHolder holder = new GeneratedKeyHolder();
 
         template.update(con -> {
@@ -48,9 +45,8 @@ public class RespuestaRepository {
         }, holder);
         return holder.getKey().longValue();
     }
-
-    // READ
-    public List<Map<String, Object>> getRespuestasAlumnoEncuesta(Long idAlumno, Long idEncuesta) {
+// READ
+    public List<Map<String, Object>> getByEncuesta(Long idAlumno, Long idEncuesta) {
         String sql = """
         SELECT
             e.id_encuesta,
@@ -80,8 +76,8 @@ public class RespuestaRepository {
                 idRespuesta
         ).stream().findFirst();
     }
-    // UPDATE
-    public int updateRespuesta(Long id,RespuestaModel respuesta) {
+// UPDATE
+    public int update(Long id, RespuestaModel respuesta) {
         String sql = """
             UPDATE Respuestas_Alumnos
             SET id_alumno = ?, id_respuesta_posible = ?, respuesta_abierta = ?
@@ -95,15 +91,13 @@ public class RespuestaRepository {
                 id
         );
     }
-
-    // DELETE
-    public int deleteRespuesta(Long idRespuestaAlumno) {
+// DELETE
+    public int delete(Long idRespuestaAlumno) {
         String sql = "DELETE FROM Respuestas_Alumnos WHERE id_respuesta_alumno = ?";
         return template.update(sql, idRespuestaAlumno);
     }
-
-    // COMPLETAR ENCUESTA Y GUARDAR EL REGISTRO
-    public Long completarEncuesta(Long idEncuesta, Long idAlumno) {
+// COMPLETAR ENCUESTA Y GUARDAR EL REGISTRO
+    public Long complete(Long idEncuesta, Long idAlumno) {
         KeyHolder holder = new GeneratedKeyHolder();
 
         template.update(con -> {

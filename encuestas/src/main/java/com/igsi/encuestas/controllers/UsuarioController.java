@@ -18,43 +18,37 @@ import java.util.Optional;
 public class UsuarioController {
 
     private final UsuarioService service;
-
     public UsuarioController(UsuarioService usuarioService) {
         this.service = usuarioService;
     }
-
-    // LISTAR USUARIOS
+// LISTAR USUARIOS
     @GetMapping
     public ResponseEntity<List<UsuarioResponse>> getAll() {
         List<UsuarioResponse> usuarios = service.getAll();
         return ResponseEntity.ok(usuarios);
     }
-
-    // OBTENER POR ID
+// OBTENER POR ID
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponse> getById(@PathVariable Long id) {
         Optional<UsuarioResponse> usuarioOpt = service.getById(id);
         return usuarioOpt.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-
-    // OBTENER POR CORREO
+// OBTENER POR CORREO
     @GetMapping("/correo/{correo}")
     public ResponseEntity<UsuarioResponse> getByCorreo(@PathVariable String correo) {
         Optional<UsuarioResponse> usuarioOpt = service.getByCorreo(correo);
         return usuarioOpt.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-
-    // CREAR USUARIO
+// CREAR USUARIO
     @PostMapping
     @PreAuthorize("hasRole('AdminGeneral')")
     public ResponseEntity<UsuarioResponse> create(@RequestBody UsuarioRequest usuarioRequest) {
         UsuarioResponse nuevoUsuario = service.save(usuarioRequest);
         return new ResponseEntity<>(nuevoUsuario, HttpStatus.CREATED);
     }
-
-    // ACTUALIZAR USUARIO
+// ACTUALIZAR USUARIO
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('AdminGeneral')")
     public ResponseEntity<UsuarioResponse> update(@PathVariable Long id,
@@ -66,8 +60,7 @@ public class UsuarioController {
         return usuarioOpt.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-
-    // ELIMINAR USUARIO
+// ELIMINAR USUARIO
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('AdminGeneral')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
@@ -75,8 +68,7 @@ public class UsuarioController {
         return eliminado ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
     }
-
-    // LOGIN
+// LOGIN
     @PostMapping("/login")
     public ResponseEntity<UsuarioLoginResponse> login(@RequestBody UsuarioLoginRequest loginRequest) {
         Optional<UsuarioLoginResponse> tokenOpt = service.login(loginRequest);

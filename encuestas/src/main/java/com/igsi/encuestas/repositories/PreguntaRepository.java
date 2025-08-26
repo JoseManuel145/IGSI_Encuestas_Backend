@@ -19,7 +19,6 @@ public class PreguntaRepository {
     public PreguntaRepository(JdbcTemplate template) {
         this.template = template;
     }
-
     private final RowMapper<PreguntaModel> preguntaRowMapper = (rs, rowNum) -> new PreguntaModel(
             rs.getObject("id_pregunta", Long.class),
             rs.getObject("id_seccion", Long.class),
@@ -29,8 +28,7 @@ public class PreguntaRepository {
             rs.getString("ayuda"),
             rs.getInt("puntaje")
     );
-
-    // Listar todas las preguntas de una sección
+// Listar todas las preguntas de una sección
     public List<PreguntaModel> getAll(Long idSeccion) {
         return template.query(
                 "SELECT * FROM Preguntas WHERE id_seccion = ?",
@@ -38,8 +36,7 @@ public class PreguntaRepository {
                 idSeccion
         );
     }
-
-    // Obtener una pregunta específica de una sección
+// Obtener una pregunta específica de una sección
     public Optional<PreguntaModel> getById(Long idSeccion, Long idPregunta) {
         return template.query(
                 "SELECT * FROM Preguntas WHERE id_seccion = ? AND id_pregunta = ?",
@@ -48,9 +45,8 @@ public class PreguntaRepository {
                 idPregunta
         ).stream().findFirst();
     }
-
-    // Crear una nueva pregunta en una sección
-    public Long savePregunta(PreguntaModel pregunta) {
+// Crear una nueva pregunta en una sección
+    public Long save(PreguntaModel pregunta) {
         KeyHolder key = new GeneratedKeyHolder();
 
         template.update(con -> {
@@ -69,9 +65,8 @@ public class PreguntaRepository {
 
         return key.getKey().longValue();
     }
-
-    // Actualizar una pregunta existente
-    public int updatePregunta(Long idPregunta, PreguntaModel pregunta) {
+// Actualizar una pregunta existente
+    public int update(Long idPregunta, PreguntaModel pregunta) {
         return template.update(
                 "UPDATE Preguntas " +
                         "SET id_seccion = ?, texto_pregunta = ?, id_tipo_pregunta = ?, orden = ?, ayuda = ?, puntaje = ? " +
@@ -85,8 +80,7 @@ public class PreguntaRepository {
                 idPregunta
         );
     }
-
-    // Eliminar una pregunta de una sección
+// Eliminar una pregunta de una sección
     public int delete(Long idPregunta) {
         return template.update(
                 "DELETE FROM Preguntas WHERE id_pregunta = ?",

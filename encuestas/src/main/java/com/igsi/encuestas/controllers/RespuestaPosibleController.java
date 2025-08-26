@@ -17,14 +17,12 @@ public class RespuestaPosibleController {
     public RespuestaPosibleController(RespuestaPosibleService service) {
         this.service = service;
     }
-
-    // Listar todas las respuestas posibles de una pregunta
+// Listar todas las respuestas posibles de una pregunta
     @GetMapping
     public ResponseEntity<List<RespuestaPosibleResponse>> getAll(@PathVariable Long idPregunta) {
         return ResponseEntity.ok(service.getAll(idPregunta));
     }
-
-    // Crear una nueva respuesta posible
+// Crear una nueva respuesta posible
     @PostMapping
     public ResponseEntity<RespuestaPosibleResponse> create(
             @PathVariable Long idPregunta,
@@ -33,8 +31,7 @@ public class RespuestaPosibleController {
         RespuestaPosibleResponse response = service.save(idPregunta, request);
         return ResponseEntity.ok(response);
     }
-
-    // Actualizar una respuesta existente
+// Actualizar una respuesta existente
     @PutMapping("/{idRespuesta}")
     public ResponseEntity<Void> update(
             @PathVariable Long idPregunta,
@@ -44,8 +41,7 @@ public class RespuestaPosibleController {
         boolean updated = service.update(idPregunta, idRespuesta, request);
         return updated ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
-
-    // Eliminar una respuesta posible
+// Eliminar una respuesta posible
     @DeleteMapping("/{idRespuesta}")
     public ResponseEntity<Void> delete(
             @PathVariable Long idPregunta,

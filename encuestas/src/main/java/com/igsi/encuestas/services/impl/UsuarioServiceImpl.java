@@ -22,22 +22,17 @@ import java.util.stream.Collectors;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
-
     private final UsuarioRepository repository;
     private final BCryptPasswordEncoder passwordEncoder;
-
     @Value("${jwt.secret}")
     private String jwtSecret;
-
     @Value("${jwt.expiration-ms}")
     private long jwtExpirationMs;
-
     public UsuarioServiceImpl(UsuarioRepository usuarioRepository) {
         this.repository = usuarioRepository;
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
-
-    // Mapea UsuarioModel -> UsuarioResponse
+// Mapea UsuarioModel -> UsuarioResponse
     private UsuarioResponse mapToResponse(UsuarioModel usuario) {
         return new UsuarioResponse(
                 usuario.getIdUsuario(),
@@ -47,24 +42,20 @@ public class UsuarioServiceImpl implements UsuarioService {
                 usuario.getIdDepartamento()
         );
     }
-
     @Override
     public List<UsuarioResponse> getAll() {
         return repository.getAll().stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
-
     @Override
     public Optional<UsuarioResponse> getById(Long id) {
         return repository.getById(id).map(this::mapToResponse);
     }
-
     @Override
     public Optional<UsuarioResponse> getByCorreo(String correo) {
         return repository.getByCorreo(correo).map(this::mapToResponse);
     }
-
     @Override
     public UsuarioResponse save(UsuarioRequest usuarioRequest) {
         String hashedPassword = passwordEncoder.encode(usuarioRequest.getPassword());
@@ -77,12 +68,10 @@ public class UsuarioServiceImpl implements UsuarioService {
                 usuarioRequest.getRol(),
                 usuarioRequest.getIdDepartamento()
         );
-
         Long iDGenerado = repository.saveUser(usuario);
         usuario.setIdUsuario(iDGenerado);
         return mapToResponse(usuario);
     }
-
     @Override
     public boolean update(Long id, UsuarioRequest usuarioRequest) {
         Optional<UsuarioModel> existing = repository.getById(id);
@@ -99,12 +88,10 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         return repository.updateUser(usuario) > 0;
     }
-
     @Override
     public boolean delete(Long id) {
         return repository.delete(id) > 0;
     }
-
     @Override
     public Optional<UsuarioLoginResponse> login(UsuarioLoginRequest loginRequest) {
         SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
@@ -116,7 +103,6 @@ public class UsuarioServiceImpl implements UsuarioService {
         if (!passwordEncoder.matches(loginRequest.getPassword(), usuario.getPassword())) {
             return Optional.empty();
         }
-
         String token = Jwts.builder()
                 .setSubject(usuario.getCorreo())
                 .claim("rol", usuario.getRol())
@@ -134,7 +120,6 @@ public class UsuarioServiceImpl implements UsuarioService {
                 usuario.getIdDepartamento(),
                 token
         );
-
         return Optional.of(response);
     }
 }

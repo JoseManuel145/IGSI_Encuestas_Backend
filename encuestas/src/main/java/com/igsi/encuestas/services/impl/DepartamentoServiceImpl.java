@@ -13,14 +13,11 @@ import java.util.stream.Collectors;
 
 @Service
 public class DepartamentoServiceImpl implements DepartamentoService {
-
     private final DepartamentoRepository repository;
-
     public DepartamentoServiceImpl(DepartamentoRepository repository) {
         this.repository = repository;
     }
-
-    // Mapea DepartamentoModel a DepartamentoResponse
+// Mapea DepartamentoModel a DepartamentoResponse
     private DepartamentoResponse mapToResponse(DepartamentoModel departamento) {
         DepartamentoResponse response = new DepartamentoResponse();
         response.setIdDepartamento(departamento.getIdDepartamento());
@@ -28,20 +25,17 @@ public class DepartamentoServiceImpl implements DepartamentoService {
         response.setDescripcion(departamento.getDescripcion());
         return response;
     }
-
     @Override
     public List<DepartamentoResponse> getAll() {
         return repository.getAll().stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
-
     @Override
     public Optional<DepartamentoResponse> getById(Long id) {
         return repository.getById(id)
                 .map(this::mapToResponse);
     }
-
     @Override
     public DepartamentoResponse save(DepartamentoRequest departamentoRequest) {
         // Convertir request a model
@@ -51,14 +45,12 @@ public class DepartamentoServiceImpl implements DepartamentoService {
                 departamentoRequest.getDescripcion(),
                 false
         );
-
         // Guardar en base de datos
-        Long idGenerado = repository.saveDepartamento(departamento);
+        Long idGenerado = repository.save(departamento);
         departamento.setIdDepartamento(idGenerado);
         // Retornar como response
         return mapToResponse(departamento);
     }
-
     @Override
     public boolean update(Long id, DepartamentoRequest departamentoRequest) {
         Optional<DepartamentoModel> existing = repository.getById(id);
@@ -68,14 +60,12 @@ public class DepartamentoServiceImpl implements DepartamentoService {
         depa.setNombre(departamentoRequest.getNombre());
         depa.setDescripcion(departamentoRequest.getDescripcion());
 
-        return repository.updateDepartamento(depa) > 0;
+        return repository.update(depa) > 0;
     }
-
     @Override
     public boolean delete(Long id) {
         return repository.delete(id) > 0;
     }
-
     @Override
     public boolean softDelete(Long id) {
         return repository.softDelete(id) > 0;

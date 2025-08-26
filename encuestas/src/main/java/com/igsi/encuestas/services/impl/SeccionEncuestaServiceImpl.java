@@ -18,10 +18,6 @@ public class SeccionEncuestaServiceImpl implements SeccionEncuestaService {
     public SeccionEncuestaServiceImpl(SeccionEncuestaRepository repository) {
         this.repository = repository;
     }
-
-    /**
-     * Convierte un {@link SeccionEncuestaModel} en un {@link SeccionEncuestaResponse}.
-     */
     private SeccionEncuestaResponse mapToResponse(SeccionEncuestaModel model) {
         SeccionEncuestaResponse response = new SeccionEncuestaResponse();
         response.setIdSeccion(model.getIdSeccion());
@@ -31,20 +27,17 @@ public class SeccionEncuestaServiceImpl implements SeccionEncuestaService {
         response.setOrden(model.getOrden());
         return response;
     }
-
     @Override
     public List<SeccionEncuestaResponse> getAll(Long idEncuesta) {
         return repository.getAll(idEncuesta)
                 .stream()
                 .map(this::mapToResponse).collect(Collectors.toList());
     }
-
     @Override
     public Optional<SeccionEncuestaResponse> getById(Long idEncuesta, Long idSeccion) {
         return repository.getById(idEncuesta, idSeccion)
                 .map(this::mapToResponse);
     }
-
     @Override
     public Long save(SeccionEncuestaResponse seccion) {
         // Convertir response a model antes de guardar
@@ -55,11 +48,10 @@ public class SeccionEncuestaServiceImpl implements SeccionEncuestaService {
                 seccion.getDescripcion(),
                 seccion.getOrden()
         );
-        Long idGenerado = repository.saveSeccion(model);
+        Long idGenerado = repository.save(model);
         model.setIdSeccion(idGenerado);
         return idGenerado;
     }
-
     @Override
     public int update(Long idEncuesta,Long idSeccion, SeccionEncuestaResponse seccion) {
         Optional<SeccionEncuestaModel> existing = repository.getById(idEncuesta, idSeccion);
@@ -70,9 +62,8 @@ public class SeccionEncuestaServiceImpl implements SeccionEncuestaService {
         model.setDescripcion(seccion.getDescripcion());
         model.setOrden(seccion.getOrden());
 
-        return repository.updateSeccion(idSeccion, model);
+        return repository.update(idSeccion, model);
     }
-
     @Override
     public int delete(Long idEncuesta, Long idSeccion) {
         return repository.delete(idSeccion);

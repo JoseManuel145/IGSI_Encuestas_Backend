@@ -12,34 +12,29 @@ import java.util.List;
 @RequestMapping("/api/tipo-pregunta")
 public class TipoPreguntaController {
     private final TipoPreguntaService service;
-
     public TipoPreguntaController(TipoPreguntaService tipoPreguntaService) {
         this.service = tipoPreguntaService;
     }
-
-    // Obtener todos los tipos de pregunta
+// Obtener todos los tipos de pregunta
     @GetMapping
     public ResponseEntity<List<TipoPreguntaResponse>> getAll() {
         List<TipoPreguntaResponse> responses = service.getAll();
         return ResponseEntity.ok(responses);
     }
-
-    // Obtener un tipo de pregunta por ID
+// Obtener un tipo de pregunta por ID
     @GetMapping("/{id}")
     public ResponseEntity<TipoPreguntaResponse> getById(@PathVariable Long id) {
         return service.getById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-
-    // Crear un nuevo tipo de pregunta
+// Crear un nuevo tipo de pregunta
     @PostMapping
     public ResponseEntity<TipoPreguntaResponse> create(@RequestBody TipoPreguntaRequest request) {
         TipoPreguntaResponse created = service.save(request);
         return ResponseEntity.ok(created);
     }
-
-    // Actualizar un tipo de pregunta
+// Actualizar un tipo de pregunta
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody TipoPreguntaRequest request) {
         boolean updated = service.update(id, request);
@@ -49,8 +44,7 @@ public class TipoPreguntaController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    // Eliminar un tipo de pregunta
+// Eliminar un tipo de pregunta
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         boolean deleted = service.delete(id);

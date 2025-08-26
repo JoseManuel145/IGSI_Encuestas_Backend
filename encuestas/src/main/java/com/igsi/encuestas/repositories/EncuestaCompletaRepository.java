@@ -27,7 +27,6 @@ public class EncuestaCompletaRepository {
             rs.getString("estado"),
             rs.getBoolean("deleted")
     );
-
     private final RowMapper<SeccionEncuestaModel> seccionRowMapper = (rs, rowNum) -> new SeccionEncuestaModel(
             rs.getObject("id_seccion", Long.class),
             rs.getObject("id_encuesta", Long.class),
@@ -35,7 +34,6 @@ public class EncuestaCompletaRepository {
             rs.getString("descripcion"),
             rs.getInt("orden")
     );
-
     private final RowMapper<PreguntaModel> preguntaRowMapper = (rs, rowNum) -> new PreguntaModel(
             rs.getObject("id_pregunta", Long.class),
             rs.getObject("id_seccion", Long.class),
@@ -45,7 +43,6 @@ public class EncuestaCompletaRepository {
             rs.getString("ayuda"),
             rs.getInt("puntaje")
     );
-
     private final RowMapper<RespuestaPosibleModel> respuestaRowMapper = (rs, rowNum) -> new RespuestaPosibleModel(
             rs.getObject("id_respuesta_posible", Long.class),
             rs.getObject("id_pregunta", Long.class),
@@ -53,33 +50,29 @@ public class EncuestaCompletaRepository {
             rs.getInt("puntaje"),
             rs.getBoolean("es_correcta")
     );
-
     // Métodos para listar
-    public EncuestaModel getEncuesta(Long idEncuesta) {
+    public EncuestaModel getById(Long idEncuesta) {
         return jdbcTemplate.query(
                 "SELECT * FROM Encuestas WHERE id_encuesta = ?",
                 encuestaRowMapper,
                 idEncuesta
         ).stream().findFirst().orElse(null);
     }
-
-    public List<SeccionEncuestaModel> getSecciones(Long idEncuesta) {
+    public List<SeccionEncuestaModel> getAllSecciones(Long idEncuesta) {
         return jdbcTemplate.query(
                 "SELECT * FROM Secciones_Encuesta WHERE id_encuesta = ? ORDER BY orden",
                 seccionRowMapper,
                 idEncuesta
         );
     }
-
-    public List<PreguntaModel> getPreguntas(Long idSeccion) {
+    public List<PreguntaModel> getAllPreguntas(Long idSeccion) {
         return jdbcTemplate.query(
                 "SELECT * FROM Preguntas WHERE id_seccion = ? ORDER BY orden",
                 preguntaRowMapper,
                 idSeccion
         );
     }
-
-    public List<RespuestaPosibleModel> getRespuestas(Long idPregunta) {
+    public List<RespuestaPosibleModel> getAllRespuestas(Long idPregunta) {
         return jdbcTemplate.query(
                 "SELECT * FROM Respuestas_Posibles WHERE id_pregunta = ?",
                 respuestaRowMapper,

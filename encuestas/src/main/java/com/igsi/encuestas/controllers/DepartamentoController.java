@@ -16,31 +16,30 @@ import java.util.Optional;
 public class DepartamentoController {
 
     private final DepartamentoService service;
-
     public DepartamentoController(DepartamentoService departamentoService) {
         this.service = departamentoService;
     }
-    // LISTAR DEPARTAMENTOS
+// LISTAR DEPARTAMENTOS
     @GetMapping
     public ResponseEntity<List<DepartamentoResponse>> getAll() {
         List<DepartamentoResponse> departamentos = service.getAll();
         return ResponseEntity.ok(departamentos);
     }
-    // OBTENER POR ID
+// OBTENER POR ID
     @GetMapping("/{id}")
     public ResponseEntity<DepartamentoResponse> getById(@PathVariable Long id) {
         Optional<DepartamentoResponse> departamentoDto = service.getById(id);
         return departamentoDto.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-    // CREAR DEPARTAMENTO
+// CREAR DEPARTAMENTO
     @PostMapping
     @PreAuthorize("hasRole('AdminGeneral')")
     public ResponseEntity<DepartamentoResponse> save(@RequestBody DepartamentoRequest dto) {
         DepartamentoResponse created = service.save(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
-    // ACTUALIZAR DEPARTAMENTO
+// ACTUALIZAR DEPARTAMENTO
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('AdminGeneral')")
     public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody DepartamentoRequest dto) {
@@ -51,7 +50,7 @@ public class DepartamentoController {
             return ResponseEntity.notFound().build(); // 404 si no existe
         }
     }
-    // ELIMINAR DEPARTAMENTO (hard delete)
+// ELIMINAR DEPARTAMENTO (hard delete)
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('AdminGeneral')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
@@ -62,7 +61,7 @@ public class DepartamentoController {
             return ResponseEntity.notFound().build(); // 404
         }
     }
-    // SOFT DELETE DEPARTAMENTO
+// SOFT DELETE DEPARTAMENTO
     @PatchMapping("/{id}/soft-delete")
     @PreAuthorize("hasRole('AdminGeneral')")
     public ResponseEntity<Void> softDelete(@PathVariable Long id) {

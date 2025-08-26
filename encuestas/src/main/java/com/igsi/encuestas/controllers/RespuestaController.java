@@ -11,12 +11,10 @@ import org.springframework.web.bind.annotation.*;
 public class RespuestaController {
 
     private final RespuestaService service;
-
     public RespuestaController(RespuestaService service) {
         this.service = service;
     }
-
-    // Guardar la respuesta de un alumno para una pregunta específica
+// Guardar la respuesta de un alumno para una pregunta específica
     @PostMapping
     public ResponseEntity<RespuestaResponse> save(
             @PathVariable Long idEncuesta,
@@ -29,8 +27,7 @@ public class RespuestaController {
         RespuestaResponse response = service.save(request);
         return ResponseEntity.ok(response);
     }
-
-    // Actualizar la respuesta de un alumno para esa pregunta
+// Actualizar la respuesta de un alumno para esa pregunta
     @PutMapping("/{idRespuesta}")
     public ResponseEntity<Void> update(
             @PathVariable Long idEncuesta,
@@ -43,7 +40,6 @@ public class RespuestaController {
         boolean updated = service.update(idRespuesta, request);
         return updated ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
-
     @PostMapping("/complete")
     public ResponseEntity<RespuestaResponse> completarEncuesta(
             @PathVariable Long idEncuesta,

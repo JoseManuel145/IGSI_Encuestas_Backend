@@ -15,11 +15,10 @@ import java.util.Optional;
 @Repository
 public class UsuarioRepository {
     private final JdbcTemplate jdbcTemplate;
-
     public UsuarioRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-    // Mapper para convertir ResultSet a Usuario
+// Mapper para convertir ResultSet a Usuario
     private final RowMapper<UsuarioModel> usuarioRowMapper = (rs, rowNum) -> new UsuarioModel(
             rs.getObject("id_usuario", Long.class),
             rs.getString("nombre"),

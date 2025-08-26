@@ -13,12 +13,10 @@ import java.util.List;
 public class PreguntaController {
 
     private final PreguntaService service;
-
     public PreguntaController(PreguntaService service) {
         this.service = service;
     }
-
-    // Listar todas las preguntas de una sección
+// Listar todas las preguntas de una sección
     @GetMapping
     public ResponseEntity<List<PreguntaResponse>> getAll(
             @PathVariable Long idEncuesta,
@@ -26,8 +24,7 @@ public class PreguntaController {
     ) {
         return ResponseEntity.ok(service.getAll(idEncuesta, idSeccion));
     }
-
-    // Obtener una pregunta específica
+// Obtener una pregunta específica
     @GetMapping("/{idPregunta}")
     public ResponseEntity<PreguntaResponse> getById(
             @PathVariable Long idEncuesta,
@@ -38,8 +35,7 @@ public class PreguntaController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-
-    // Crear una nueva pregunta
+// Crear una nueva pregunta
     @PostMapping
     public ResponseEntity<PreguntaResponse> create(
             @PathVariable Long idEncuesta,
@@ -49,8 +45,7 @@ public class PreguntaController {
         PreguntaResponse response = service.save(idEncuesta, idSeccion, request);
         return ResponseEntity.ok(response);
     }
-
-    // Actualizar una pregunta
+// Actualizar una pregunta
     @PutMapping("/{idPregunta}")
     public ResponseEntity<Void> update(
             @PathVariable Long idEncuesta,
@@ -62,8 +57,7 @@ public class PreguntaController {
         return updated ? ResponseEntity.noContent().build()
                 : ResponseEntity.notFound().build();
     }
-
-    // Eliminar una pregunta
+// Eliminar una pregunta
     @DeleteMapping("/{idPregunta}")
     public ResponseEntity<Void> delete(
             @PathVariable Long idEncuesta,

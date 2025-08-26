@@ -57,7 +57,7 @@ public class PreguntaServiceImpl implements PreguntaService {
                 request.getPuntaje()
         );
 
-        Long id = repository.savePregunta(model);
+        Long id = repository.save(model);
         model.setIdPregunta(id);
         return mapToResponse(model);
     }
@@ -75,7 +75,7 @@ public class PreguntaServiceImpl implements PreguntaService {
         model.setPuntaje(request.getPuntaje());
         model.setIdTipoPregunta(request.getIdTipoPregunta());
 
-        return repository.updatePregunta(idPregunta, model) > 0;
+        return repository.update(idPregunta, model) > 0;
     }
 
     @Override

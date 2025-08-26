@@ -23,43 +23,34 @@ import java.util.stream.Collectors;
 public class AlumnoServiceImpl implements AlumnoService {
 
     private final AlumnoRepository repository;
-
     @Value("${jwt.secret}")
     private String jwtSecret;
-
     @Value("${jwt.expiration-ms}")
     private long jwtExpirationMs;
-
     public AlumnoServiceImpl(AlumnoRepository alumnoRepository) {
         this.repository = alumnoRepository;
     }
-
-    // Mapeos
+// Mapeos
     private AlumnoResponse mapToResponse(AlumnoModel alumno) {
         return new AlumnoResponse(alumno.getIdAlumno(), alumno.getNombre());
     }
-
     private AlumnoIdResponse mapToIdResponse(AlumnoModel alumno) {
         return new AlumnoIdResponse(alumno.getIdAlumno(), alumno.getNombre(), alumno.getPassword());
     }
-
     @Override
     public List<AlumnoResponse> getAll() {
         return repository.getAll().stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
-
     @Override
     public Optional<AlumnoIdResponse> getById(Long id) {
         return repository.getById(id).map(this::mapToIdResponse);
     }
-
     @Override
     public Optional<AlumnoResponse> getByNombre(String nombre) {
         return repository.getByNombre(nombre).map(this::mapToResponse);
     }
-
     @Override
     public AlumnoResponse save(AlumnoRequest alumnoRequest) {
         AlumnoModel alumno = new AlumnoModel(
@@ -67,20 +58,16 @@ public class AlumnoServiceImpl implements AlumnoService {
                 alumnoRequest.getNombre(),
                 alumnoRequest.getPassword()
         );
-
         // Guardar en BD y obtener el ID generado
-        Long idGenerado = repository.saveAlumno(alumno);
+        Long idGenerado = repository.save(alumno);
         alumno.setIdAlumno(idGenerado);
-
         // Mapear a DTO de respuesta
         return new AlumnoResponse(alumno.getIdAlumno(), alumno.getNombre());
     }
-
     @Override
     public boolean delete(Long id) {
         return repository.delete(id) > 0;
     }
-
     @Override
     public Optional<AlumnoLoginResponse> login(AlumnoRequest alumnoRequest) {
         // Crear clave segura de al menos 256 bits
@@ -90,12 +77,10 @@ public class AlumnoServiceImpl implements AlumnoService {
         if (alumnoOpt.isEmpty()) return Optional.empty();
 
         AlumnoModel alumno = alumnoOpt.get();
-
         // Validar contraseña
         if (!alumno.getPassword().equals(alumnoRequest.getPassword())) {
             return Optional.empty();
         }
-
         // Generar JWT
         String token = Jwts.builder()
                 .setSubject(alumno.getNombre())
@@ -110,7 +95,6 @@ public class AlumnoServiceImpl implements AlumnoService {
                 alumno.getNombre(),
                 token
         );
-
         return Optional.of(response);
     }
 }

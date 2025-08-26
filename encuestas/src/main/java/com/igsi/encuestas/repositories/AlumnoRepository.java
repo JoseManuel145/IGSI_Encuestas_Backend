@@ -24,7 +24,6 @@ public class AlumnoRepository {
             rs.getString("nombre"),
             rs.getString("password")
     );
-
 //  LISTAR TODOS LOS ALUMNOS
     public List<AlumnoModel> getAll() {
         return jdbcTemplate.query(
@@ -48,9 +47,8 @@ public class AlumnoRepository {
                 id
         ).stream().findFirst();
     }
-
 //  REGISTRAR UN ALUMNO
-    public Long saveAlumno(AlumnoModel alumno) {
+    public Long save(AlumnoModel alumno) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(
@@ -64,7 +62,6 @@ public class AlumnoRepository {
 
         return keyHolder.getKey().longValue();
     }
-
     //  ELIMINAR UN ALUMNO
     public int delete(Long id) {
         return jdbcTemplate.update(

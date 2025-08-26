@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 public class EncuestaCompletaController {
 
     private final EncuestaCompletaService service;
-
     public EncuestaCompletaController(EncuestaCompletaService service) {
         this.service = service;
     }
@@ -21,7 +20,7 @@ public class EncuestaCompletaController {
      */
     @GetMapping("/{id}/completa")
     public ResponseEntity<EncuestaCompletaResponse> getEncuestaCompleta(@PathVariable Long id) {
-        EncuestaCompletaResponse response = service.getEncuestaCompleta(id);
+        EncuestaCompletaResponse response = service.GetCompleta(id);
         if (response == null) {
             return ResponseEntity.notFound().build();
         }

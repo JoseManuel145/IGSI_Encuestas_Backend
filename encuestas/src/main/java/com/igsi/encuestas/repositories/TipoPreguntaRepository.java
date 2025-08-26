@@ -16,29 +16,24 @@ import java.util.Optional;
 public class TipoPreguntaRepository {
 
     private final JdbcTemplate jdbcTemplate;
-
     public TipoPreguntaRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-
     private final RowMapper<TipoPreguntaModel> rowMapper = (rs, rowNum) -> new TipoPreguntaModel(
             rs.getObject("id_tipo", Long.class),
             rs.getString("nombre"),
             rs.getString("descripcion")
     );
-
-    // Listar todos
+// Listar todos
     public List<TipoPreguntaModel> getAll() {
         return jdbcTemplate.query("SELECT * FROM Tipos_Pregunta", rowMapper);
     }
-
-    // Obtener por ID
+// Obtener por ID
     public Optional<TipoPreguntaModel> getById(Long id) {
         return jdbcTemplate.query("SELECT * FROM Tipos_Pregunta WHERE id_tipo = ?", rowMapper, id)
                 .stream().findFirst();
     }
-
-    // Guardar
+// Guardar
     public Long save(TipoPreguntaModel tipoPregunta) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -52,8 +47,7 @@ public class TipoPreguntaRepository {
         }, keyHolder);
         return keyHolder.getKey().longValue();
     }
-
-    // Actualizar
+// Actualizar
     public int update(TipoPreguntaModel tipoPregunta) {
         return jdbcTemplate.update(
                 "UPDATE Tipos_Pregunta SET nombre = ?, descripcion = ? WHERE id_tipo = ?",
@@ -62,8 +56,7 @@ public class TipoPreguntaRepository {
                 tipoPregunta.getIdTipo()
         );
     }
-
-    // Eliminar
+// Eliminar
     public int delete(Long id) {
         return jdbcTemplate.update("DELETE FROM Tipos_Pregunta WHERE id_tipo = ?", id);
     }

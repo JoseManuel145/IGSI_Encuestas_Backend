@@ -14,11 +14,9 @@ import java.util.stream.Collectors;
 @Service
 public class TipoPreguntaServiceImpl implements TipoPreguntaService {
     private final TipoPreguntaRepository repository;
-
     public TipoPreguntaServiceImpl(TipoPreguntaRepository tipoPreguntaRepository) {
         this.repository = tipoPreguntaRepository;
     }
-
 //  Mapeo de la respuesta
     private TipoPreguntaResponse mapToResponse(TipoPreguntaModel tipoPreguntaModel) {
         TipoPreguntaResponse response = new TipoPreguntaResponse();
@@ -33,13 +31,11 @@ public class TipoPreguntaServiceImpl implements TipoPreguntaService {
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
-
     @Override
     public Optional<TipoPreguntaResponse> getById(Long id) {
         return repository.getById(id)
                 .map(this::mapToResponse);
     }
-
     @Override
     public TipoPreguntaResponse save(TipoPreguntaRequest tipoPregunta) {
         TipoPreguntaModel model = new TipoPreguntaModel(
@@ -51,7 +47,6 @@ public class TipoPreguntaServiceImpl implements TipoPreguntaService {
         model.setIdTipo(id);
         return mapToResponse(model);
     }
-
     @Override
     public boolean update(Long id, TipoPreguntaRequest tipoPregunta) {
         Optional<TipoPreguntaModel> existing = repository.getById(id);
@@ -62,7 +57,6 @@ public class TipoPreguntaServiceImpl implements TipoPreguntaService {
         model.setDescripcion(tipoPregunta.getDescripcion());
         return repository.update(model) > 0;
     }
-
     @Override
     public boolean delete(Long id) {
         return repository.delete(id) > 0;

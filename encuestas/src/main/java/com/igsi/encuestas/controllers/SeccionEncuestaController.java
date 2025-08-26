@@ -13,23 +13,19 @@ import java.util.Optional;
 public class SeccionEncuestaController {
 
     private final SeccionEncuestaService service;
-
     public SeccionEncuestaController(SeccionEncuestaService service) {
         this.service = service;
     }
-
     @GetMapping
     public ResponseEntity<List<SeccionEncuestaResponse>> getAll(@PathVariable Long idEncuesta) {
         return ResponseEntity.ok(service.getAll(idEncuesta));
     }
-
     @GetMapping("/{idSeccion}")
     public ResponseEntity<SeccionEncuestaResponse> getById(@PathVariable Long idEncuesta, @PathVariable Long idSeccion) {
         Optional<SeccionEncuestaResponse> seccion = service.getById(idEncuesta, idSeccion);
         return seccion.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-
     @PostMapping
     public ResponseEntity<Long> create(@PathVariable Long idEncuesta,
                                        @RequestBody SeccionEncuestaResponse request) {
@@ -37,7 +33,6 @@ public class SeccionEncuestaController {
         Long idGenerado = service.save(request);
         return ResponseEntity.ok(idGenerado);
     }
-
     @PutMapping("/{idSeccion}")
     public ResponseEntity<Void> update(
             @PathVariable Long idEncuesta,
@@ -49,7 +44,6 @@ public class SeccionEncuestaController {
         }
         return ResponseEntity.notFound().build();
     }
-
     @DeleteMapping("/{idSeccion}")
     public ResponseEntity<Void> delete(@PathVariable Long idEncuesta,
                                        @PathVariable Long idSeccion) {

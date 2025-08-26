@@ -42,7 +42,7 @@ public class DepartamentoRepository {
         ).stream().findFirst();
     }
 //  Crear un departamento
-    public Long saveDepartamento(DepartamentoModel departamento) {
+    public Long save(DepartamentoModel departamento) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
@@ -58,7 +58,7 @@ public class DepartamentoRepository {
         return keyHolder.getKey().longValue();
     }
 //  Actualizar un departamento
-    public int updateDepartamento(DepartamentoModel departamento) {
+    public int update(DepartamentoModel departamento) {
         return jdbcTemplate.update(
                 "UPDATE Departamentos SET nombre = ?, descripcion = ? WHERE id_departamento = ?",
                 departamento.getNombre(),
