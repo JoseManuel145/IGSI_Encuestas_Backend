@@ -4,6 +4,7 @@ import com.igsi.encuestas.dto.encuesta.request.PreguntaRequest;
 import com.igsi.encuestas.dto.encuesta.response.PreguntaResponse;
 import com.igsi.encuestas.services.PreguntaService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class PreguntaController {
         return ResponseEntity.ok(service.getById(idEncuesta, idSeccion, idPregunta));
     }
     @PostMapping
+    @PreAuthorize("hasAnyRole('AdminGeneral','Empleado')")
     public ResponseEntity<PreguntaResponse> create(
             @PathVariable Long idEncuesta,
             @PathVariable Long idSeccion,
@@ -41,6 +43,7 @@ public class PreguntaController {
         return ResponseEntity.ok(response);
     }
     @PutMapping("/{idPregunta}")
+    @PreAuthorize("hasAnyRole('AdminGeneral','Empleado')")
     public ResponseEntity<Void> update(
             @PathVariable Long idEncuesta,
             @PathVariable Long idSeccion,
@@ -51,6 +54,7 @@ public class PreguntaController {
         return ResponseEntity.noContent().build();
     }
     @DeleteMapping("/{idPregunta}")
+    @PreAuthorize("hasAnyRole('AdminGeneral','Empleado')")
     public ResponseEntity<Void> delete(
             @PathVariable Long idEncuesta,
             @PathVariable Long idSeccion,

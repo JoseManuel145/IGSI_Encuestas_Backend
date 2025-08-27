@@ -4,6 +4,7 @@ import com.igsi.encuestas.dto.encuesta.request.TipoPreguntaRequest;
 import com.igsi.encuestas.dto.encuesta.response.TipoPreguntaResponse;
 import com.igsi.encuestas.services.TipoPreguntaService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,12 +29,14 @@ public class TipoPreguntaController {
     }
 // Crear un nuevo tipo de pregunta
     @PostMapping
+    @PreAuthorize("hasAnyRole('AdminGeneral','Empleado')")
     public ResponseEntity<TipoPreguntaResponse> create(@RequestBody TipoPreguntaRequest request) {
         TipoPreguntaResponse created = service.save(request);
         return ResponseEntity.ok(created);
     }
 // Actualizar un tipo de pregunta
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('AdminGeneral','Empleado')")
     public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody TipoPreguntaRequest request) {
         boolean updated = service.update(id, request);
         if (updated) {
@@ -44,6 +47,7 @@ public class TipoPreguntaController {
     }
 // Eliminar un tipo de pregunta
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('AdminGeneral','Empleado')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         boolean deleted = service.delete(id);
         if (deleted) {

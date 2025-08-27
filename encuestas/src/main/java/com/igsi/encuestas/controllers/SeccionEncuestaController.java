@@ -3,6 +3,7 @@ package com.igsi.encuestas.controllers;
 import com.igsi.encuestas.dto.encuesta.response.SeccionEncuestaResponse;
 import com.igsi.encuestas.services.SeccionEncuestaService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class SeccionEncuestaController {
         return ResponseEntity.ok(service.getById(idEncuesta, idSeccion));
     }
     @PostMapping
+    @PreAuthorize("hasAnyRole('AdminGeneral','Empleado')")
     public ResponseEntity<Long> create(@PathVariable Long idEncuesta,
                                        @RequestBody SeccionEncuestaResponse request) {
         request.setIdEncuesta(idEncuesta);
@@ -32,6 +34,7 @@ public class SeccionEncuestaController {
         return ResponseEntity.ok(idGenerado);
     }
     @PutMapping("/{idSeccion}")
+    @PreAuthorize("hasAnyRole('AdminGeneral','Empleado')")
     public ResponseEntity<Void> update(@PathVariable Long idEncuesta,
                                        @PathVariable Long idSeccion,
                                        @RequestBody SeccionEncuestaResponse request) {
@@ -39,6 +42,7 @@ public class SeccionEncuestaController {
         return ResponseEntity.noContent().build();
     }
     @DeleteMapping("/{idSeccion}")
+    @PreAuthorize("hasAnyRole('AdminGeneral','Empleado')")
     public ResponseEntity<Void> delete(@PathVariable Long idEncuesta,
                                        @PathVariable Long idSeccion) {
         service.delete(idEncuesta, idSeccion);

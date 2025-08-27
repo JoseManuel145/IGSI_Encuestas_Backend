@@ -21,10 +21,12 @@ public class UsuarioController {
         this.service = usuarioService;
     }
     @GetMapping
+    @PreAuthorize("hasAnyRole('AdminGeneral','Empleado')")
     public ResponseEntity<List<UsuarioResponse>> getAll() {
         return ResponseEntity.ok(service.getAll());
     }
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('AdminGeneral','Empleado')")
     public ResponseEntity<UsuarioResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getById(id));
     }

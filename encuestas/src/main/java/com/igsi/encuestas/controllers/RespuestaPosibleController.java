@@ -4,6 +4,7 @@ import com.igsi.encuestas.dto.encuesta.request.RespuestaPosibleRequest;
 import com.igsi.encuestas.dto.encuesta.response.RespuestaPosibleResponse;
 import com.igsi.encuestas.services.RespuestaPosibleService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class RespuestaPosibleController {
     }
 // Crear una nueva respuesta posible
     @PostMapping
+    @PreAuthorize("hasAnyRole('AdminGeneral','Empleado')")
     public ResponseEntity<RespuestaPosibleResponse> create(
             @PathVariable Long idPregunta,
             @RequestBody RespuestaPosibleRequest request
@@ -33,6 +35,7 @@ public class RespuestaPosibleController {
     }
 // Actualizar una respuesta existente
     @PutMapping("/{idRespuesta}")
+    @PreAuthorize("hasAnyRole('AdminGeneral','Empleado')")
     public ResponseEntity<Void> update(
             @PathVariable Long idPregunta,
             @PathVariable Long idRespuesta,
@@ -43,6 +46,7 @@ public class RespuestaPosibleController {
     }
 // Eliminar una respuesta posible
     @DeleteMapping("/{idRespuesta}")
+    @PreAuthorize("hasAnyRole('AdminGeneral','Empleado')")
     public ResponseEntity<Void> delete(
             @PathVariable Long idPregunta,
             @PathVariable Long idRespuesta
