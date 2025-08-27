@@ -20,17 +20,22 @@ public class EncuestaRepository {
     public EncuestaRepository(JdbcTemplate template) {
         this.template = template;
     }
-    private final RowMapper<EncuestaModel> encuestaRowMapper = (rs, rowNum) -> new EncuestaModel(
-            rs.getObject("id_encuesta", Long.class),
-            rs.getString("titulo"),
-            rs.getString("descripcion"),
-            rs.getObject("id_departamento", Long.class),
-            rs.getObject("fecha_inicio", LocalDate.class),
-            rs.getObject("fecha_fin", LocalDate.class),
-            rs.getString("estado"),
-            rs.getBoolean("deleted")
-    );
-//  Listar todas las encuestas
+    private final RowMapper<EncuestaModel> encuestaRowMapper = (rs, rowNum) -> {
+        LocalDate fechaInicio = rs.getDate("fecha_inicio") != null ? rs.getDate("fecha_inicio").toLocalDate() : null;
+        LocalDate fechaFin = rs.getDate("fecha_fin") != null ? rs.getDate("fecha_fin").toLocalDate() : null;
+
+        return new EncuestaModel(
+                rs.getObject("id_encuesta", Long.class),
+                rs.getString("titulo"),
+                rs.getString("descripcion"),
+                rs.getObject("id_departamento", Long.class),
+                fechaInicio,
+                fechaFin,
+                rs.getString("estado"),
+                rs.getBoolean("deleted")
+        );
+    };
+    //  Listar todas las encuestas
     public List<EncuestaModel> getAll() {
         return template.query(
                 "SELECT * FROM Encuestas WHERE deleted = FALSE ORDER BY id_encuesta DESC",
@@ -84,19 +89,28 @@ public class EncuestaRepository {
     }
 //  Actualizar una encuesta
     public int update(Long id, EncuestaModel encuesta) {
+        java.sql.Date fechaInicioSql = encuesta.getFechaInicio() != null
+                ? java.sql.Date.valueOf(encuesta.getFechaInicio())
+                : null;
+
+        java.sql.Date fechaFinSql = encuesta.getFechaFin() != null
+                ? java.sql.Date.valueOf(encuesta.getFechaFin())
+                : null;
+
         return template.update(
                 "UPDATE Encuestas " +
-                      "SET titulo = ?, descripcion = ?, id_departamento = ?, fecha_inicio = ?, fecha_fin = ?, estado = ?, deleted = ? " +
-                      "WHERE id_encuesta = ?",
+                        "SET titulo = ?, descripcion = ?, id_departamento = ?, fecha_inicio = ?, fecha_fin = ?, estado = ?, deleted = ? " +
+                        "WHERE id_encuesta = ?",
                 encuesta.getTitulo(),
                 encuesta.getDescripcion(),
                 encuesta.getIdDepartamento(),
-                java.sql.Date.valueOf(encuesta.getFechaInicio()),
-                java.sql.Date.valueOf(encuesta.getFechaFin()),
+                fechaInicioSql,
+                fechaFinSql,
                 encuesta.getEstado(),
                 encuesta.getDeleted() != null ? encuesta.getDeleted() : false,
                 id
         );
+
     }
 //  Eliminar una encuesta de forma permanente
     public int delete(Long id) {
