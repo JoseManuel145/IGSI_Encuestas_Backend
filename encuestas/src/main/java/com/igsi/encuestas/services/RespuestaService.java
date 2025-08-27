@@ -1,6 +1,7 @@
 package com.igsi.encuestas.services;
 
 import com.igsi.encuestas.dto.respuestas.request.RespuestaRequest;
+import com.igsi.encuestas.dto.respuestas.response.RespuestaEstadisticaResponse;
 import com.igsi.encuestas.dto.respuestas.response.RespuestaResponse;
 
 import java.util.List;
@@ -12,4 +13,5 @@ public interface RespuestaService {
     List<Map<String,Object>> getAll(Long idAlumno, Long idEncuesta);
     boolean update(Long id, RespuestaRequest respuesta);
     boolean delete(Long id);
+    List<RespuestaEstadisticaResponse> contarRespuestas(Long idPregunta);
 }

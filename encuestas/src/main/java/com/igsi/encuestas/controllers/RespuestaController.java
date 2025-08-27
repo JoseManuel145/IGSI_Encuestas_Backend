@@ -1,10 +1,13 @@
 package com.igsi.encuestas.controllers;
 
 import com.igsi.encuestas.dto.respuestas.request.RespuestaRequest;
+import com.igsi.encuestas.dto.respuestas.response.RespuestaEstadisticaResponse;
 import com.igsi.encuestas.dto.respuestas.response.RespuestaResponse;
 import com.igsi.encuestas.services.RespuestaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/preguntas/{idPregunta}/respuestas")
@@ -35,5 +38,11 @@ public class RespuestaController {
         request.setId_pregunta(idPregunta);
         boolean updated = service.update(idRespuesta, request);
         return updated ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
+//  Obtener cuantas veces se escogio una respuesta
+    @GetMapping("/respuestas")
+    public ResponseEntity<List<RespuestaEstadisticaResponse>> getEstadisticas(@PathVariable Long idPregunta) {
+        List<RespuestaEstadisticaResponse> stats = service.contarRespuestas(idPregunta);
+        return ResponseEntity.ok(stats);
     }
 }

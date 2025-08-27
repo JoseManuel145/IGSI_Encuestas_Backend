@@ -1,5 +1,6 @@
 package com.igsi.encuestas.repositories;
 
+import com.igsi.encuestas.dto.respuestas.response.RespuestaEstadisticaResponse;
 import com.igsi.encuestas.models.RespuestaModel;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -26,6 +27,13 @@ public class RespuestaRepository {
             rs.getObject("id_respuesta_posible", Long.class),
             rs.getString("respuesta_abierta")
     );
+    // RowMapper separado para RespuestaEstadisticaResponse
+    private final RowMapper<RespuestaEstadisticaResponse> respuestaEstadisticaRowMapper =
+            (rs, rowNum) -> new RespuestaEstadisticaResponse(
+                    rs.getLong("id_respuesta_posible"),
+                    rs.getString("texto_respuesta"),
+                    rs.getLong("total_selecciones")
+            );
 // CREATE
     public Long save(RespuestaModel respuestaPosible) {
         KeyHolder holder = new GeneratedKeyHolder();
@@ -96,20 +104,21 @@ public class RespuestaRepository {
         String sql = "DELETE FROM Respuestas_Alumnos WHERE id_respuesta_alumno = ?";
         return template.update(sql, idRespuestaAlumno);
     }
-// COMPLETAR ENCUESTA Y GUARDAR EL REGISTRO
-    public Long complete(Long idEncuesta, Long idAlumno) {
-        KeyHolder holder = new GeneratedKeyHolder();
-
-        template.update(con -> {
-            PreparedStatement statement = con.prepareStatement(
-                    "INSERT INTO encuestas_completadas(id_encuesta, id_alumno) " +
-                            "VALUES (?,?)",
-                    Statement.RETURN_GENERATED_KEYS
-            );
-            statement.setObject(1, idEncuesta);
-            statement.setObject(2, idAlumno);
-            return statement;
-        }, holder);
-        return holder.getKey().longValue();
+//  Hacer el conteo de cada respuesta
+    public List<RespuestaEstadisticaResponse> contarRespuestas(Long idPregunta) {
+        String sql = """
+            SELECT\s
+                rp.id_respuesta_posible,
+                rp.texto_respuesta,
+                COUNT(ra.id_respuesta_alumno) AS total_selecciones
+            FROM Respuestas_Posibles rp
+            LEFT JOIN Respuestas_Alumnos ra
+                ON rp.id_respuesta_posible = ra.id_respuesta_posible
+            WHERE rp.id_pregunta = ?
+            GROUP BY rp.id_respuesta_posible, rp.texto_respuesta
+            ORDER BY total_selecciones DESC;
+            
+        """;
+        return template.query(sql, respuestaEstadisticaRowMapper, idPregunta);
     }
 }

@@ -1,6 +1,7 @@
 package com.igsi.encuestas.services.impl;
 
 import com.igsi.encuestas.dto.respuestas.request.RespuestaRequest;
+import com.igsi.encuestas.dto.respuestas.response.RespuestaEstadisticaResponse;
 import com.igsi.encuestas.dto.respuestas.response.RespuestaResponse;
 import com.igsi.encuestas.models.RespuestaModel;
 import com.igsi.encuestas.repositories.RespuestaRepository;
@@ -59,5 +60,10 @@ public class RespuestaServiceImpl implements RespuestaService {
     @Override
     public boolean delete(Long id) {
         return repository.delete(id) > 0;
+    }
+
+    @Override
+    public List<RespuestaEstadisticaResponse> contarRespuestas(Long idPregunta) {
+        return repository.contarRespuestas(idPregunta);
     }
 }
