@@ -30,10 +30,17 @@ public class EncuestaRepository {
             rs.getString("estado"),
             rs.getBoolean("deleted")
     );
-//  Listar todos los departamentos
+//  Listar todas las encuestas
     public List<EncuestaModel> getAll() {
         return template.query(
                 "SELECT * FROM Encuestas WHERE deleted = FALSE ORDER BY id_encuesta DESC",
+                encuestaRowMapper
+        );
+    }
+    //  Listar todas las encuestas habilitadas y no borradas (para que el alumno las responda)
+    public List<EncuestaModel> getAllHabilitadas() {
+        return template.query(
+                "SELECT * FROM Encuestas WHERE deleted = FALSE AND estado = 'habilitada' ORDER BY id_encuesta DESC",
                 encuestaRowMapper
         );
     }

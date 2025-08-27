@@ -41,6 +41,17 @@ public class EncuestaServiceImpl implements EncuestaService {
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<EncuestaResponse> getAllHabilitadas() {
+        List<EncuestaModel> encuestas = repository.getAllHabilitadas();
+        if (encuestas.isEmpty()) {
+            throw new ResourceNotFoundException("No hay encuestas habilitadas");
+        }
+        return encuestas.stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
     @Override
     public EncuestaResponse getById(Long id) {
         EncuestaModel encuesta = repository.getById(id)

@@ -19,9 +19,14 @@ public class EncuestaController {
         this.service = encuestaService;
     }
 // LISTAR TODAS
-    @GetMapping
+    @GetMapping("/master")
     public ResponseEntity<List<EncuestaResponse>> getAll() {
         return ResponseEntity.ok(service.getAll());
+    }
+//  ENDPOINT para mostrar las encuestas disponibles a los alumnos
+    @GetMapping("/alumnos")
+    public ResponseEntity<List<EncuestaResponse>> getAllHabilitadas() {
+        return ResponseEntity.ok(service.getAllHabilitadas());
     }
 // OBTENER POR ID
     @GetMapping("/{id}")
