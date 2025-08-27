@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/encuestas/{idEncuesta}/secciones/{idSeccion}/preguntas")
+@RequestMapping("/api/secciones/{idSeccion}/preguntas")
 public class PreguntaController {
 
     private final PreguntaService service;
@@ -19,48 +19,41 @@ public class PreguntaController {
     }
     @GetMapping
     public ResponseEntity<List<PreguntaResponse>> getAll(
-            @PathVariable Long idEncuesta,
             @PathVariable Long idSeccion
     ) {
-        return ResponseEntity.ok(service.getAll(idEncuesta, idSeccion));
+        return ResponseEntity.ok(service.getAll(idSeccion));
     }
     @GetMapping("/{idPregunta}")
     public ResponseEntity<PreguntaResponse> getById(
-            @PathVariable Long idEncuesta,
             @PathVariable Long idSeccion,
             @PathVariable Long idPregunta
     ) {
-        return ResponseEntity.ok(service.getById(idEncuesta, idSeccion, idPregunta));
+        return ResponseEntity.ok(service.getById(idSeccion, idPregunta));
     }
     @PostMapping
     @PreAuthorize("hasAnyRole('AdminGeneral','Empleado')")
     public ResponseEntity<PreguntaResponse> create(
-            @PathVariable Long idEncuesta,
-            @PathVariable Long idSeccion,
             @RequestBody PreguntaRequest request
     ) {
-        PreguntaResponse response = service.save(idEncuesta, idSeccion, request);
+        PreguntaResponse response = service.save(request);
         return ResponseEntity.ok(response);
     }
     @PutMapping("/{idPregunta}")
     @PreAuthorize("hasAnyRole('AdminGeneral','Empleado')")
     public ResponseEntity<Void> update(
-            @PathVariable Long idEncuesta,
-            @PathVariable Long idSeccion,
             @PathVariable Long idPregunta,
             @RequestBody PreguntaRequest request
     ) {
-        service.update(idEncuesta, idSeccion, idPregunta, request);
+        service.update(idPregunta, request);
         return ResponseEntity.noContent().build();
     }
     @DeleteMapping("/{idPregunta}")
     @PreAuthorize("hasAnyRole('AdminGeneral','Empleado')")
     public ResponseEntity<Void> delete(
-            @PathVariable Long idEncuesta,
             @PathVariable Long idSeccion,
             @PathVariable Long idPregunta
     ) {
-        service.delete(idEncuesta, idSeccion, idPregunta);
+        service.delete(idSeccion, idPregunta);
         return ResponseEntity.noContent().build();
     }
 }

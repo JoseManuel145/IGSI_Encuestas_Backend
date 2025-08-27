@@ -58,4 +58,11 @@ public class DepartamentoController {
         service.softDelete(id);
         return ResponseEntity.noContent().build();
     }
+// RESTAURAR UN DEPARTAMENTO
+    @PatchMapping("/{id}/restaurar")
+    @PreAuthorize("hasRole('AdminGeneral')")
+    public ResponseEntity<Void> restaurar(@PathVariable Long id) {
+        service.restaurar(id);
+        return ResponseEntity.noContent().build();
+    }
 }

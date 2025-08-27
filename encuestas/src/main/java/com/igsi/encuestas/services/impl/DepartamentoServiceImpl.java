@@ -79,4 +79,12 @@ public class DepartamentoServiceImpl implements DepartamentoService {
             throw new ResourceNotFoundException("Departamento con id " + id + " no encontrado o no pudo deshabilitarse");
         }
     }
+
+    @Override
+    public void restaurar(Long id) {
+        boolean deleted = repository.restaurar(id) > 0;
+        if (!deleted) {
+            throw new ResourceNotFoundException("Departamento con id " + id + " no encontrado o no pudo habilitarse");
+        }
+    }
 }

@@ -30,27 +30,27 @@ public class PreguntaServiceImpl implements PreguntaService {
         return response;
     }
     @Override
-    public List<PreguntaResponse> getAll(Long idEncuesta, Long idSeccion) {
+    public List<PreguntaResponse> getAll(Long idSeccion) {
         return repository.getAll(idSeccion).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
     @Override
-    public PreguntaResponse getById(Long idEncuesta, Long idSeccion, Long idPregunta) {
-        PreguntaModel pregunta = repository.getById(idSeccion, idPregunta)
+    public PreguntaResponse getById(Long idSeccion, Long idPregunta) {
+        PreguntaModel pregunta = repository.getById(idPregunta)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Pregunta con id " + idPregunta + " no encontrada en la sección " + idSeccion
+                        "Pregunta con id " + idPregunta + " no encontrada en la seccion " + idSeccion
                 ));
         return mapToResponse(pregunta);
     }
     @Override
-    public PreguntaResponse save(Long idEncuesta, Long idSeccion, PreguntaRequest request) {
+    public PreguntaResponse save(PreguntaRequest request) {
         if (request.getTextoPregunta() == null || request.getTextoPregunta().isBlank()) {
             throw new IllegalArgumentException("El texto de la pregunta no puede estar vacío");
         }
         PreguntaModel model = new PreguntaModel(
                 null,
-                idSeccion,
+                request.getIdSeccion(),
                 request.getTextoPregunta(),
                 request.getIdTipoPregunta(),
                 request.getOrden(),
@@ -62,10 +62,10 @@ public class PreguntaServiceImpl implements PreguntaService {
         return mapToResponse(model);
     }
     @Override
-    public boolean update(Long idEncuesta, Long idSeccion, Long idPregunta, PreguntaRequest request) {
-        PreguntaModel existing = repository.getById(idSeccion, idPregunta)
+    public boolean update(Long idPregunta, PreguntaRequest request) {
+        PreguntaModel existing = repository.getById(idPregunta)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Pregunta con id " + idPregunta + " no encontrada en la sección " + idSeccion
+                        "Pregunta con id " + idPregunta + " no encontrada"
                 ));
         existing.setTextoPregunta(request.getTextoPregunta());
         existing.setIdTipoPregunta(request.getIdTipoPregunta());
@@ -80,11 +80,11 @@ public class PreguntaServiceImpl implements PreguntaService {
         return true;
     }
     @Override
-    public boolean delete(Long idEncuesta, Long idSeccion, Long idPregunta) {
+    public boolean delete(Long idSeccion, Long idPregunta) {
         int deleted = repository.delete(idPregunta);
         if (deleted <= 0) {
             throw new ResourceNotFoundException(
-                    "Pregunta con id " + idPregunta + " no encontrada o no pudo eliminarse"
+                    "Pregunta con id " + idPregunta + " no encontrada o no pudo eliminarse, id seccion: " + idSeccion
             );
         }
         return true;

@@ -37,11 +37,11 @@ public class PreguntaRepository {
         );
     }
 // Obtener una pregunta específica de una sección
-    public Optional<PreguntaModel> getById(Long idSeccion, Long idPregunta) {
+    public Optional<PreguntaModel> getById(Long idPregunta) {
         return template.query(
-                "SELECT * FROM Preguntas WHERE id_seccion = ? AND id_pregunta = ?",
+                "SELECT * FROM Preguntas WHERE id_pregunta = ?",
                 preguntaRowMapper,
-                idSeccion,
+
                 idPregunta
         ).stream().findFirst();
     }

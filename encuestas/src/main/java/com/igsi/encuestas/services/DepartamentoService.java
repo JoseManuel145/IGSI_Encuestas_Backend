@@ -41,4 +41,5 @@ public interface DepartamentoService {
      */
     void delete(Long id);
     void softDelete(Long id);
+    void restaurar(Long id);
 }

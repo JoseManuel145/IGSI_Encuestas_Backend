@@ -80,4 +80,11 @@ public class DepartamentoRepository {
                 id
         );
     }
+    //  Eliminar un departamento logicamente
+    public int restaurar(Long id) {
+        return jdbcTemplate.update(
+                "UPDATE Departamentos SET deleted = FALSE WHERE id_departamento = ?",
+                id
+        );
+    }
 }
