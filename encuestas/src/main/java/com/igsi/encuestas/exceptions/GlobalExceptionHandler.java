@@ -13,98 +13,64 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Error genérico no controlado
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleGlobalException(Exception ex) {
+    private Map<String, Object> buildResponseBody(Exception ex, HttpStatus status) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("message", ex.getMessage());
-        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+        body.put("status", status.value());
+        // Agregar origen del error
+        if (ex.getStackTrace().length > 0) {
+            StackTraceElement origin = ex.getStackTrace()[0];
+            Map<String, Object> location = new HashMap<>();
+            location.put("class", origin.getClassName());
+            location.put("method", origin.getMethodName());
+            location.put("file", origin.getFileName());
+            location.put("line", origin.getLineNumber());
+            body.put("origin", location);
+        }
+        return body;
     }
-
-    // Validación de RequestBody (Bean Validation)
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleGlobalException(Exception ex) {
+        return new ResponseEntity<>(buildResponseBody(ex, HttpStatus.INTERNAL_SERVER_ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors()
                 .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
+        Map<String, Object> body = buildResponseBody(ex, HttpStatus.BAD_REQUEST);
         body.put("errors", errors);
-        body.put("status", HttpStatus.BAD_REQUEST.value());
 
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
-
-    // Recurso no encontrado
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> handleResourceNotFound(ResourceNotFoundException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("message", ex.getMessage());
-        body.put("status", HttpStatus.NOT_FOUND.value());
-        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(buildResponseBody(ex, HttpStatus.NOT_FOUND), HttpStatus.NOT_FOUND);
     }
-
-    // Conflictos de datos (p. ej. clave única duplicada)
     @ExceptionHandler(DataConflictException.class)
     public ResponseEntity<?> handleDataConflict(DataConflictException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("message", ex.getMessage());
-        body.put("status", HttpStatus.CONFLICT.value());
-        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+        return new ResponseEntity<>(buildResponseBody(ex, HttpStatus.CONFLICT), HttpStatus.CONFLICT);
     }
-
-    // Petición incorrecta (reglas de negocio violadas)
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<?> handleBadRequest(BadRequestException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("message", ex.getMessage());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(buildResponseBody(ex, HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
     }
-
-    // No autorizado (login fallido, token inválido)
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<?> handleUnauthorized(UnauthorizedException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("message", ex.getMessage());
-        body.put("status", HttpStatus.UNAUTHORIZED.value());
-        return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(buildResponseBody(ex, HttpStatus.UNAUTHORIZED), HttpStatus.UNAUTHORIZED);
     }
-
-    // Prohibido (usuario sin permisos para la acción)
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<?> handleForbidden(ForbiddenException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("message", ex.getMessage());
-        body.put("status", HttpStatus.FORBIDDEN.value());
-        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(buildResponseBody(ex, HttpStatus.FORBIDDEN), HttpStatus.FORBIDDEN);
     }
-
-    // Recurso temporalmente no disponible
     @ExceptionHandler(ResourceUnavailableException.class)
     public ResponseEntity<?> handleResourceUnavailable(ResourceUnavailableException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("message", ex.getMessage());
-        body.put("status", HttpStatus.SERVICE_UNAVAILABLE.value());
-        return new ResponseEntity<>(body, HttpStatus.SERVICE_UNAVAILABLE);
+        return new ResponseEntity<>(buildResponseBody(ex, HttpStatus.SERVICE_UNAVAILABLE), HttpStatus.SERVICE_UNAVAILABLE);
     }
-    // Error cuando una operación de negocio no se completa correctamente
     @ExceptionHandler(OperationFailedException.class)
     public ResponseEntity<?> handleOperationFailed(OperationFailedException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("message", ex.getMessage());
-        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(buildResponseBody(ex, HttpStatus.INTERNAL_SERVER_ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
 }
