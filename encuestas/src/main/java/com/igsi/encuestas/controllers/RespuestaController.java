@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/{idAlumno}/encuestas/{idEncuesta}/secciones/{idSeccion}/preguntas/{idPregunta}/respuestas")
+@RequestMapping("/api/preguntas/{idPregunta}/respuestas")
 public class RespuestaController {
 
     private final RespuestaService service;
@@ -17,8 +17,6 @@ public class RespuestaController {
 // Guardar la respuesta de un alumno para una pregunta específica
     @PostMapping
     public ResponseEntity<RespuestaResponse> save(
-            @PathVariable Long idEncuesta,
-            @PathVariable Long idSeccion,
             @PathVariable Long idPregunta,
             @RequestBody RespuestaRequest request
     ) {
@@ -30,8 +28,6 @@ public class RespuestaController {
 // Actualizar la respuesta de un alumno para esa pregunta
     @PutMapping("/{idRespuesta}")
     public ResponseEntity<Void> update(
-            @PathVariable Long idEncuesta,
-            @PathVariable Long idSeccion,
             @PathVariable Long idPregunta,
             @PathVariable Long idRespuesta,
             @RequestBody RespuestaRequest request
