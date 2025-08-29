@@ -6,38 +6,24 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final JwtAuthEntryPoint authEntryPoint;
-    private final JwtAccessDeniedHandler accessDeniedHandler;
+    private final CorsConfig corsConfig;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-                          JwtAuthEntryPoint authEntryPoint,
-                          JwtAccessDeniedHandler accessDeniedHandler) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        this.authEntryPoint = authEntryPoint;
-        this.accessDeniedHandler = accessDeniedHandler;
+    public SecurityConfig(CorsConfig corsConfig) {
+        this.corsConfig = corsConfig;
     }
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource())) // <- AQUI
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/alumnos/login", "/api/alumnos").permitAll()
-                        .requestMatchers("/api/usuarios/login").permitAll()
-
-                        // El resto requieren autenticación
+                        .requestMatchers("/api/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(authEntryPoint)  // 401
-                        .accessDeniedHandler(accessDeniedHandler)  // 403
-                )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
+                .httpBasic(httpBasic -> {});
         return http.build();
     }
 }

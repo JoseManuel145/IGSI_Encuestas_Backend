@@ -9,9 +9,14 @@ public interface EncuestaService {
 
     /**
      * Obtiene todas las encuestas registradas (ordenadas por fecha o id DESC).
-     * @return Lista de encuestas
+     * @return Lista de encuestas donde Deleted = FALSE
      */
     List<EncuestaResponse> getAll();
+    /**
+     * Obtiene todas las encuestas registradas (ordenadas por fecha o id DESC).
+     * @return Lista de encuestas donde Deleted = TRUE
+     */
+    List<EncuestaResponse> getAllDeleted();
     /**
      * Obtiene todas las encuestas registradas (ordenadas por fecha o id DESC).
      * @return Lista de encuestas

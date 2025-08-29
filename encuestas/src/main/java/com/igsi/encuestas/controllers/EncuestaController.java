@@ -18,10 +18,15 @@ public class EncuestaController {
     public EncuestaController(EncuestaService encuestaService) {
         this.service = encuestaService;
     }
-// LISTAR TODAS
+// LISTAR TODAS LAS ENCUESTAS deleted = FALSE
     @GetMapping("/master")
     public ResponseEntity<List<EncuestaResponse>> getAll() {
         return ResponseEntity.ok(service.getAll());
+    }
+// LISTAR TODAS LAS ENCUESTAS deleted = TRUE
+    @GetMapping("/deleted")
+    public ResponseEntity<List<EncuestaResponse>> getAllDeleted() {
+        return ResponseEntity.ok(service.getAllDeleted());
     }
 //  ENDPOINT para mostrar las encuestas disponibles a los alumnos
     @GetMapping("/alumnos")

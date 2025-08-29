@@ -42,6 +42,13 @@ public class EncuestaRepository {
                 encuestaRowMapper
         );
     }
+    //  Listar todas las encuestas
+    public List<EncuestaModel> getAllDeleted() {
+        return template.query(
+                "SELECT * FROM Encuestas WHERE deleted = TRUE ORDER BY id_encuesta DESC",
+                encuestaRowMapper
+        );
+    }
     //  Listar todas las encuestas habilitadas y no borradas (para que el alumno las responda)
     public List<EncuestaModel> getAllHabilitadas() {
         return template.query(

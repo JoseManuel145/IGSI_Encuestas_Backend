@@ -43,6 +43,17 @@ public class EncuestaServiceImpl implements EncuestaService {
     }
 
     @Override
+    public List<EncuestaResponse> getAllDeleted() {
+        List<EncuestaModel> encuestas = repository.getAllDeleted();
+        if (encuestas.isEmpty()) {
+            throw new ResourceNotFoundException("No se encontraron encuestas eliminadas");
+        }
+        return encuestas.stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<EncuestaResponse> getAllHabilitadas() {
         List<EncuestaModel> encuestas = repository.getAllHabilitadas();
         if (encuestas.isEmpty()) {

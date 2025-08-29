@@ -40,6 +40,7 @@
 | Método | Ruta                                           | Descripción                                                              |
 |--------|------------------------------------------------|--------------------------------------------------------------------------|
 | GET    | `/api/encuestas/master`                        | Listar todas las encuestas (admin)                                       |
+| GET    | `/api/encuestas/deleted`                       | Listar todas las encuestas en la papelera (admin)                        |
 | GET    | `/api/encuestas/alumnos`                       | Listar encuestas habilitadas para alumnos                                |
 | GET    | `/api/encuestas/{id}`                          | Obtener encuesta por ID                                                  |
 | GET    | `/api/encuestas/departamento/{idDepartamento}` | Obtener encuestas por departamento                                       |
