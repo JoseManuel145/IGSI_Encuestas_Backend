@@ -122,21 +122,21 @@ public class EncuestaRepository {
 //  Eliminar una encuesta de forma permanente
     public int delete(Long id) {
         return template.update(
-                "DELETE FROM Encuestas WHERE id_departamento = ?",
+                "DELETE FROM Encuestas WHERE id_encuesta = ?",
                 id
         );
     }
 //  Eliminar una encuesta logicamente
     public int softDelete(Long id) {
         return template.update(
-                "UPDATE Encuestas SET deleted = TRUE WHERE id_departamento = ?",
+                "UPDATE Encuestas SET deleted = TRUE WHERE id_encuesta = ?",
                 id
         );
     }
     //  Restaurar una encuesta eliminada logicamente
     public int restaurar(Long id) {
         return template.update(
-                "UPDATE Encuestas SET deleted = FALSE WHERE id_departamento = ?",
+                "UPDATE Encuestas SET deleted = FALSE WHERE id_encuesta = ?",
                 id
         );
     }
