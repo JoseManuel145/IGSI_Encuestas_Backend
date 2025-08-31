@@ -72,13 +72,18 @@ public class UsuarioServiceImpl implements UsuarioService {
                 usuarioRequest.getPassword() == null || usuarioRequest.getPassword().isBlank()) {
             throw new BadRequestException("Nombre, correo y contraseña son obligatorios");
         }
+
         String hashedPassword = passwordEncoder.encode(usuarioRequest.getPassword());
+
+        String rol = (usuarioRequest.getRol() == null || usuarioRequest.getRol().isBlank())
+                ? "Empleado"
+                : usuarioRequest.getRol();
         UsuarioModel usuario = new UsuarioModel(
                 null,
                 usuarioRequest.getNombre(),
                 usuarioRequest.getCorreo(),
                 hashedPassword,
-                usuarioRequest.getRol(),
+                rol,
                 usuarioRequest.getIdDepartamento()
         );
         Long idGenerado = repository.saveUser(usuario);

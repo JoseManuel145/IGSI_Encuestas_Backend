@@ -62,8 +62,11 @@ public class UsuarioRepository {
             ps.setString(2, usuario.getCorreo());
             ps.setString(3, usuario.getPassword());
             ps.setString(4, usuario.getRol());
-            ps.setLong(5, usuario.getIdDepartamento());
-
+            if (usuario.getIdDepartamento() != null) {
+                ps.setLong(5, usuario.getIdDepartamento());
+            } else {
+                ps.setNull(5, java.sql.Types.INTEGER);
+            }
             return ps;
         }, keyHolder);
 
