@@ -14,4 +14,5 @@ public interface RespuestaService {
     boolean update(Long id, RespuestaRequest respuesta);
     boolean delete(Long id);
     List<RespuestaEstadisticaResponse> contarRespuestas(Long idPregunta);
+    boolean guardarEncuestaCompleta(Long idAlumno, Long idEncuesta);
 }

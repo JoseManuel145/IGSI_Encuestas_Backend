@@ -121,5 +121,13 @@ public class RespuestaRepository {
         """;
         return template.query(sql, respuestaEstadisticaRowMapper, idPregunta);
     }
-//
+//  Guardar en tabla de encuestas completadas
+public int guardarEncuestaCompleta(Long idAlumno, Long idEncuesta) {
+    String sql = """
+        INSERT INTO encuestas_completas (id_alumno, id_encuesta)
+        VALUES (?, ?)
+        """;
+    return template.update(sql, idAlumno, idEncuesta);
+}
+
 }

@@ -3,6 +3,7 @@ package com.igsi.encuestas.controllers;
 import com.igsi.encuestas.dto.encuesta.request.EncuestaRequest;
 import com.igsi.encuestas.dto.encuesta.response.EncuestaResponse;
 import com.igsi.encuestas.services.EncuestaService;
+import com.igsi.encuestas.services.RespuestaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,8 +16,10 @@ import java.util.List;
 public class EncuestaController {
 
     private final EncuestaService service;
-    public EncuestaController(EncuestaService encuestaService) {
+    private final RespuestaService respuestaService;
+    public EncuestaController(EncuestaService encuestaService, RespuestaService respuestaService) {
         this.service = encuestaService;
+        this.respuestaService = respuestaService;
     }
 // LISTAR TODAS LAS ENCUESTAS deleted = FALSE
     @GetMapping("/master")
@@ -32,6 +35,20 @@ public class EncuestaController {
     @GetMapping("/alumno/{idAlumno}")
     public ResponseEntity<List<EncuestaResponse>> getAllHabilitadas(@PathVariable Long idAlumno) {
         return ResponseEntity.ok(service.getAllHabilitadas(idAlumno));
+    }
+    //  Guardar encuesta completada
+    @PostMapping("/{idEncuesta}/alumno/{idAlumno}")
+    public ResponseEntity<String> completarEncuesta(
+            @PathVariable Long idAlumno,
+            @PathVariable Long idEncuesta) {
+
+        boolean guardado = respuestaService.guardarEncuestaCompleta(idAlumno, idEncuesta);
+        if (guardado) {
+            return ResponseEntity.ok("Encuesta marcada como completada correctamente");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("No se pudo marcar la encuesta como completada");
+        }
     }
 // OBTENER POR ID
     @GetMapping("/{id}")

@@ -66,4 +66,10 @@ public class RespuestaServiceImpl implements RespuestaService {
     public List<RespuestaEstadisticaResponse> contarRespuestas(Long idPregunta) {
         return repository.contarRespuestas(idPregunta);
     }
+
+    @Override
+    public boolean guardarEncuestaCompleta(Long idAlumno, Long idEncuesta) {
+        int filasAfectadas = repository.guardarEncuestaCompleta(idAlumno, idEncuesta);
+        return filasAfectadas > 0;
+    }
 }
