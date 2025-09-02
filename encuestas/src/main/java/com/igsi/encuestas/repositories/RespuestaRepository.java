@@ -121,4 +121,5 @@ public class RespuestaRepository {
         """;
         return template.query(sql, respuestaEstadisticaRowMapper, idPregunta);
     }
+//
 }

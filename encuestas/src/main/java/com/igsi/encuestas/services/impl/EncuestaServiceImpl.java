@@ -54,8 +54,8 @@ public class EncuestaServiceImpl implements EncuestaService {
     }
 
     @Override
-    public List<EncuestaResponse> getAllHabilitadas() {
-        List<EncuestaModel> encuestas = repository.getAllHabilitadas();
+    public List<EncuestaResponse> getAllHabilitadas(Long idAlumno) {
+        List<EncuestaModel> encuestas = repository.getAllHabilitadas(idAlumno);
         if (encuestas.isEmpty()) {
             throw new ResourceNotFoundException("No hay encuestas habilitadas");
         }

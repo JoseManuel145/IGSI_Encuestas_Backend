@@ -29,9 +29,9 @@ public class EncuestaController {
         return ResponseEntity.ok(service.getAllDeleted());
     }
 //  ENDPOINT para mostrar las encuestas disponibles a los alumnos
-    @GetMapping("/alumnos")
-    public ResponseEntity<List<EncuestaResponse>> getAllHabilitadas() {
-        return ResponseEntity.ok(service.getAllHabilitadas());
+    @GetMapping("/alumno/{idAlumno}")
+    public ResponseEntity<List<EncuestaResponse>> getAllHabilitadas(@PathVariable Long idAlumno) {
+        return ResponseEntity.ok(service.getAllHabilitadas(idAlumno));
     }
 // OBTENER POR ID
     @GetMapping("/{id}")

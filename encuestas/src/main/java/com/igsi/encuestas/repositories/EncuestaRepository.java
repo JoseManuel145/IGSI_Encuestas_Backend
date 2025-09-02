@@ -49,14 +49,25 @@ public class EncuestaRepository {
                 encuestaRowMapper
         );
     }
-    //  Listar todas las encuestas habilitadas y no borradas (para que el alumno las responda)
-    public List<EncuestaModel> getAllHabilitadas() {
-        return template.query(
-                "SELECT * FROM Encuestas WHERE deleted = FALSE AND estado = 'habilitada' ORDER BY id_encuesta DESC",
-                encuestaRowMapper
-        );
+    //  Listar todas las encuestas habilitadas y no borradas que el alumno aún no ha respondido
+    public List<EncuestaModel> getAllHabilitadas(Long idAlumno) {
+        String sql = """
+        SELECT e.*
+        FROM Encuestas e
+        WHERE e.deleted = FALSE
+          AND e.estado = 'habilitada'
+          AND e.id_encuesta NOT IN (
+              SELECT ec.id_encuesta
+              FROM encuestas_completas ec
+              WHERE ec.id_alumno = ?
+          )
+        ORDER BY e.id_encuesta DESC
+        """;
+
+        return template.query(sql, encuestaRowMapper, idAlumno);
     }
-//  Buscar por ID
+
+    //  Buscar por ID
     public Optional<EncuestaModel> getById(Long id) {
         return template.query(
                 "SELECT * FROM Encuestas WHERE id_encuesta = ? AND deleted = FALSE ORDER BY id_encuesta DESC",

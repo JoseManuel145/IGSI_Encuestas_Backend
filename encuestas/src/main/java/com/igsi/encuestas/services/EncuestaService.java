@@ -21,7 +21,7 @@ public interface EncuestaService {
      * Obtiene todas las encuestas registradas (ordenadas por fecha o id DESC).
      * @return Lista de encuestas
      */
-    List<EncuestaResponse> getAllHabilitadas();
+    List<EncuestaResponse> getAllHabilitadas(Long idAlumno);
     /**
      * Busca una encuesta por su ID.
      * @param id ID de la encuesta
